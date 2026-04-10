@@ -1,24 +1,49 @@
 [
-  {
-    "id": 1,
-    "title": "Приветствие",
-    "color": "from-pink-500 to-purple-600",
-    "icon": "👋",
-    "theory": [
-      { "type": "text", "header": "Нихао!", "content": "Самое популярное приветствие..." },
-      { "type": "hanzi", "char": "你好", "pinyin": "nǐ hǎo", "translation": "Привет" }
-    ],
-    "quiz1": [
-      {
-        "id": "q1_1",
-        "type": "test",
-        "taskText": "Выберите перевод",
-        "question": "你好",
-        "options": ["Привет", "Пока", "Еда", "Друг"],
-        "correctAnswer": "Привет"
-      }
-    ],
-    "quiz2": [],
-    "final": []
-  }
+	{
+		"id": 1,
+		"title": "Приветствие",
+		"color": "from-pink-500 to-purple-600",
+		"icon": "👋",
+		"theory": [
+			{
+				"type": "text",
+				"header": "Нихао!",
+				"content": "Самое популярное приветствие..."
+			},
+			{
+				"type": "hanzi",
+				"char": "你好",
+				"pinyin": "nǐ hǎo",
+				"translation": "Привет"
+			}
+		],
+		"quiz1": [
+			{
+				"id": "1",
+				"type": "test",
+				"question": "你好",
+				"options": [
+					"Привет",
+					"Пока",
+					"Ок",
+					"Нет"
+				],
+				"correctAnswer": "Привет"
+			},
+			{
+				"id": "2",
+				"type": "listening",
+				"audioText": "谢谢",
+				"options": [
+					"Спасибо",
+					"Друг",
+					"Дом",
+					"Мир"
+				],
+				"correctAnswer": "Спасибо"
+			}
+		],
+		"quiz2": [],
+		"final": []
+	}
 ]

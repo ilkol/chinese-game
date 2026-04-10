@@ -5,6 +5,9 @@ import SpaceMap from './components/SpaceMap';
 import LevelModal from './components/LevelModal';
 import TopicMenu from './components/TopicMenu';
 import TheoryReader from './components/TheoryReader';
+import QuizCard from './components/QuizCard';
+import ListeningCard from './components/ListeningCard';
+import { getLevels } from './services/api';
 
 const LEVELS_DATA = [
 	{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
@@ -19,6 +22,8 @@ const THEORY_SLIDES = [
 
 
 function App() {
+	const [levels, setLevels] = useState([]);
+	const [loading, setLoading] = useState(true);
 	const [view, setView] = useState('map'); // 'map' или 'topic'
 	const [progress, setProgress] = useState({
 		theory: true,      // Теория открыта всегда
@@ -26,24 +31,20 @@ function App() {
 		quiz2: false,      // Тест 2 закрыт
 		final: false       // Итог закрыт
 	});
+	const [activeStep, setActiveStep] = useState(null); // 'theory', 'quiz1', 'quiz2', 'final'
+	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
 	const [selectedLevel, setSelectedLevel] = useState(null);
 	const [activePlanetId, setActivePlanetId] = useState(1);
 	const [isModalOpened, setIsModalOpen] = useState(false);
+	const [wrongAnswers, setWrongAnswers] = useState([]);
+	const [isFinished, setIsFinished] = useState(false);
 
-	const levels = [
-		{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
-		{ id: 2, title: 'Числа', color: 'from-orange-400 to-red-500', icon: '🔢' },
-		// ... остальные уровни
-	];
 
 	const handleSelectLevel = (level) => {
 		setIsModalOpen(true);
 		setSelectedLevel(level);
 		setActivePlanetId(level.id);
-
-		console.log(level.id);
-		console.log(activePlanetId);
 	};
 	const handleCloseModal = () => {
 		setIsModalOpen(false);
@@ -56,9 +57,17 @@ function App() {
 		setTimeout(() => setView('topic_menu'), 300);
 		// setView('topic_menu');
 	};
-	const startStep = (stepId) => {
-		if (stepId === 'theory') setView('theory');
-		if (stepId === 'quiz1') console.log('Запуск теста 1'); // Сюда позже прикрутим твои Quiz компоненты
+	const handleNextQuestion = () => {
+		const questions = selectedLevel[activeStep]; // Берем массив вопросов для текущего этапа
+		if (currentQuestionIndex < questions.length - 1) {
+			setCurrentQuestionIndex(prev => prev + 1);
+		} else {
+			// Если вопросы кончились — завершаем этап
+			const nextProgress = { ...progress, [activeStep]: true };
+			setProgress(nextProgress);
+			setView('topic_menu');
+			setActiveStep(null);
+		}
 	};
 
 	const completeTheory = () => {
@@ -66,9 +75,55 @@ function App() {
 		setView('topic_menu');
 	};
 
+	const handleStartStep = (stepId) => {
+		setActiveStep(stepId);
+		setCurrentQuestionIndex(0);
+		setWrongAnswers([]);
+		setIsFinished(false);
+		setView(stepId === 'theory' ? 'theory' : 'quiz');
+	};
+
+	const handleAnswer = (option) => {
+		const currentQuestions = selectedLevel[activeStep];
+		const currentQ = currentQuestions[currentQuestionIndex];
+
+		if (option === currentQ.correctAnswer) {
+			setIsFinished(true);
+			setTimeout(() => {
+				if (currentQuestionIndex < currentQuestions.length - 1) {
+					// Переход к следующему вопросу
+					setCurrentQuestionIndex(prev => prev + 1);
+					setWrongAnswers([]);
+					setIsFinished(false);
+				} else {
+					// Завершение всего теста
+					setProgress(prev => ({ ...prev, [activeStep]: true }));
+					setView('topic_menu');
+				}
+			}, 1500);
+		} else {
+			if (!wrongAnswers.includes(option)) {
+				setWrongAnswers([...wrongAnswers, option]);
+			}
+		}
+	};
+
+
+
 	useEffect(() => {
-		console.log("Теперь activePlanetId действительно изменился:", activePlanetId);
+		getLevels().then(data => {
+			setLevels(data);
+			setLoading(false);
+		});
 	}, [activePlanetId]);
+
+	if (loading) {
+		return (
+			<div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-white font-bold">
+				ЗАГРУЗКА ВСЕЛЕННОЙ...
+			</div>
+		);
+	}
 
 
 	return (
@@ -77,7 +132,7 @@ function App() {
 			{view === 'map' && (
 				<>
 					<SpaceMap
-						levels={LEVELS_DATA}
+						levels={levels}
 						onSelectLevel={handleSelectLevel}
 						activePlanetId={activePlanetId}
 					/>
@@ -96,7 +151,7 @@ function App() {
 					level={selectedLevel}
 					progress={progress}
 					onBack={() => setView('map')}
-					onStartStep={startStep}
+					onStartStep={handleStartStep}
 				/>
 			)}
 
@@ -104,9 +159,22 @@ function App() {
 			{view === 'theory' && (
 				<TheoryReader
 					title={selectedLevel.title}
-					slides={THEORY_SLIDES}
+					slides={levels[selectedLevel.id - 1].theory}
 					onFinish={completeTheory}
 				/>
+			)}
+			{view === 'quiz' && selectedLevel && (
+				<div className="min-h-screen flex items-center justify-center p-4">
+					{(() => {
+						const qData = selectedLevel[activeStep][currentQuestionIndex];
+						const props = { ...qData, onAnswer: handleAnswer, wrongAnswers, isFinished };
+
+						if (qData.type === 'test') return <QuizCard {...props} />;
+						if (qData.type === 'listening') return <ListeningCard {...props} />;
+						if (qData.type === 'blank') return <FillInBlanksCard {...props} />;
+						if (qData.type === 'matching') return <MatchingCard pairs={qData.pairs} onComplete={() => handleAnswer(qData.correctAnswer)} />;
+					})()}
+				</div>
 			)}
 		</div>
 	);
