@@ -1,25 +1,23 @@
 import { useState } from 'react';
-import QuizCard from './components/QuizCard';
-import ListeningCard from './components/ListeningCard';
+import FillInBlanksCard from './components/FillInBlanksCard';
 
 function App() {
-  // Храним массив ответов, на которые уже нажали
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
 
-  const sampleQuestion = {
-	task: "Выберите правильный перевод",
-    question: "你好",
-    options: ["Привет", "Пока", "Спасибо", "Друг"],
-    correctAnswer: "Привет"
+  // Наш текущий вопрос (теперь это объект)
+  const currentQuestion = {
+    sentence: "我喜欢 [___] 音乐",
+    options: ["中国", "汉语", "漂亮", "快"],
+    correctAnswer: "中国",
+    taskText: "Выберите правильное слово"
   };
 
   const handleAnswer = (option) => {
-    if (option === sampleQuestion.correctAnswer) {
-      setIsFinished(true); // Победа!
-      // Здесь можно будет переключить вопрос через секунду
+    // ВАЖНО: проверяем относительно текущего вопроса
+    if (option === currentQuestion.correctAnswer) {
+      setIsFinished(true);
     } else {
-      // Добавляем неверный вариант в список "битых"
       if (!wrongAnswers.includes(option)) {
         setWrongAnswers([...wrongAnswers, option]);
       }
@@ -28,14 +26,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <ListeningCard
-	 	taskText={sampleQuestion.task}
-        audioText={sampleQuestion.question}
-        options={sampleQuestion.options}
-        correctAnswer={sampleQuestion.correctAnswer}
+      <FillInBlanksCard 
+        taskText={currentQuestion.taskText}
+        sentence={currentQuestion.sentence}
+        options={currentQuestion.options}
+        correctAnswer={currentQuestion.correctAnswer} // Передаем правильный ответ
         onAnswer={handleAnswer}
-        wrongAnswers={wrongAnswers} // Передаем массив ошибок
-        isFinished={isFinished}     // Передаем статус успеха
+        wrongAnswers={wrongAnswers}
+        isFinished={isFinished}
       />
     </div>
   );
