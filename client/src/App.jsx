@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import QuizCard from './components/QuizCard';
+import ListeningCard from './components/ListeningCard';
 
 function App() {
   // Храним массив ответов, на которые уже нажали
@@ -27,9 +28,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <QuizCard 
+      <ListeningCard
 	 	taskText={sampleQuestion.task}
-        question={sampleQuestion.question}
+        audioText={sampleQuestion.question}
         options={sampleQuestion.options}
         correctAnswer={sampleQuestion.correctAnswer}
         onAnswer={handleAnswer}
