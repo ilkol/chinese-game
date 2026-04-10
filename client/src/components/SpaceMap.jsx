@@ -1,15 +1,19 @@
-import { motion, animate, useMotionValue } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
+import { motion, animate, useMotionValue, useTransform } from 'framer-motion'; // Добавили useTransform
+import { useRef, useEffect } from 'react';
 import { Target } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
 
-const SpaceMap = ({ levels, onSelectLevel, lastUnlockedId = 1 }) => {
-	const [scale, setScale] = useState(0.7);
+const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
 	const containerRef = useRef(null);
 
-	// Прямое управление координатами
+	const scale = useMotionValue(0.7);
 	const x = useMotionValue(0);
 	const y = useMotionValue(0);
+
+	// ХИТРОСТЬ: Фон будет зумиться очень слабо.
+	// Когда масштаб карты от 0.4 до 1.2, масштаб фона будет от 1.1 до 1.3.
+	// Это гарантирует отсутствие рамок и дает эффект глубины.
+	const backgroundScale = useTransform(scale, [0.4, 1.2], [1.1, 1.3]);
 
 	const planets = levels.map((level, index) => ({
 		...level,
@@ -17,47 +21,48 @@ const SpaceMap = ({ levels, onSelectLevel, lastUnlockedId = 1 }) => {
 		y: index * 300 + 150,
 	}));
 
-	const focusOnPlanet = (planetId) => {
+	const focusOnPlanet = (planetId, customScale = 1.0) => {
 		const planet = planets.find(p => p.id === planetId);
 		if (!planet) return;
 
-		const targetScale = 1.0;
-		const targetX = -planet.x;
-		const targetY = -planet.y + (window.innerHeight / 2);
-
-		animate(x, targetX, { type: 'spring', stiffness: 35, damping: 15 });
-		animate(y, targetY, { type: 'spring', stiffness: 35, damping: 15 });
-
-		animate(scale, targetScale, {
-			type: 'spring', stiffness: 35, damping: 15,
-			onUpdate: (latest) => setScale(latest)
-		});
+		animate(x, -planet.x, { type: 'spring', stiffness: 35, damping: 15 });
+		animate(y, -planet.y + (window.innerHeight / 2), { type: 'spring', stiffness: 35, damping: 15 });
+		animate(scale, customScale, { type: 'spring', stiffness: 35, damping: 15 });
 	};
 
 	useEffect(() => {
-		const timer = setTimeout(() => focusOnPlanet(lastUnlockedId), 100);
-		return () => clearTimeout(timer);
-	}, []);
+		if (activePlanetId) {
+			focusOnPlanet(activePlanetId, 1.3);
+		} else {
+			focusOnPlanet(1, 0.7);
+		}
+	}, [activePlanetId]);
 
 	const handleWheel = (e) => {
 		const delta = e.deltaY > 0 ? -0.05 : 0.05;
-		setScale((prev) => Math.min(Math.max(prev + delta, 0.4), 1.2));
+		const currentScale = scale.get();
+		scale.set(Math.min(Math.max(currentScale + delta, 0.4), 1.2));
 	};
 
 	return (
 		<div
 			ref={containerRef}
 			onWheel={handleWheel}
-			// Поменяли items-center на items-start, чтобы карта не прыгала в середину
 			className="fixed inset-0 bg-[#020617] overflow-hidden touch-none flex items-start justify-center"
 		>
-			{/* Фон */}
-			<div className="fixed inset-0 z-0 bg-[#020617]" style={{
-				backgroundImage: `url(${spaceBg})`, backgroundSize: 'cover', backgroundPosition: 'center',
-				transform: `scale(${1.1 + (scale * 0.1)})`, opacity: 0.5, transition: 'transform 0.1s ease-out'
-			}} />
+			{/* ФОН с защитой от рамок */}
+			<motion.div 
+				className="fixed inset-0 z-0 bg-[#020617]" 
+				style={{
+					backgroundImage: `url(${spaceBg})`, 
+					backgroundSize: 'cover', 
+					backgroundPosition: 'center',
+					opacity: 0.5,
+					scale: backgroundScale // Используем трансформированное значение
+				}} 
+			/>
 
-			{/* СЛОЙ 1: МАСШТАБ (Теперь items-start, чтобы точка отсчета была сверху) */}
+			{/* СЛОЙ 1: МАСШТАБ */}
 			<motion.div
 				style={{ scale }}
 				className="w-full h-full flex items-start justify-center pointer-events-none"
@@ -71,17 +76,16 @@ const SpaceMap = ({ levels, onSelectLevel, lastUnlockedId = 1 }) => {
 					onPointerDown={() => {
 						x.stop();
 						y.stop();
+						scale.stop();
 					}}
-					// Добавили originY: 0, чтобы внутри зум-слоя карта росла сверху вниз
 					className="relative w-[1000px] h-[4000px] cursor-grab active:cursor-grabbing flex justify-center z-10 pointer-events-auto origin-top"
 				>
 					<svg className="absolute inset-0 w-full h-full pointer-events-none">
 						{planets.length > 0 && (
 							<path
-								d={`M ${500 + planets[0].x} ${planets[0].y + 60} ` +
+								d={`M ${500 + planets[0].x} ${planets[0].y + 60} ` + 
 									planets.slice(1).map(p => `L ${500 + p.x} ${p.y + 60}`).join(' ')}
-								fill="none" stroke="white" strokeWidth="3" strokeDasharray="10 15" className="opacity-20"
-							/>
+								fill="none" stroke="white" strokeWidth="3" strokeDasharray="10 15" className="opacity-20" />
 						)}
 					</svg>
 
@@ -104,12 +108,12 @@ const SpaceMap = ({ levels, onSelectLevel, lastUnlockedId = 1 }) => {
 
 			{/* Оверлей управления */}
 			<div className="absolute bottom-10 right-10 flex flex-col gap-4 z-20">
-				<button onClick={() => focusOnPlanet(lastUnlockedId)} className="w-14 h-14 bg-blue-600 border border-blue-400 rounded-full text-white flex items-center justify-center shadow-2xl hover:bg-blue-500 active:scale-90 transition-all">
+				<button onClick={() => focusOnPlanet(activePlanetId || 1)} className="w-14 h-14 bg-blue-600 border border-blue-400 rounded-full text-white flex items-center justify-center shadow-2xl hover:bg-blue-500 active:scale-90 transition-all">
 					<Target size={28} />
 				</button>
 				<div className="h-[1px] bg-white/10 my-1" />
-				<button onClick={() => setScale(s => Math.min(s + 0.1, 1.2))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">+</button>
-				<button onClick={() => setScale(s => Math.max(s - 0.1, 0.4))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">−</button>
+				<button onClick={() => scale.set(Math.min(scale.get() + 0.1, 1.2))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">+</button>
+				<button onClick={() => scale.set(Math.max(scale.get() - 0.1, 0.4))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">−</button>
 			</div>
 		</div>
 	);

@@ -1,44 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FillInBlanksCard from './components/FillInBlanksCard';
 import MatchingCard from './components/MatchingCard';
 import SpaceMap from './components/SpaceMap';
 import LevelModal from './components/LevelModal';
 
 function App() {
-  const [selectedLevel, setSelectedLevel] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedLevel, setSelectedLevel] = useState(null);
+	const [activePlanetId, setActivePlanetId] = useState(1);
 
-  const levels = [
-    { id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
-    { id: 2, title: 'Числа', color: 'from-orange-400 to-red-500', icon: '🔢' },
-    // ... остальные уровни
-  ];
+	const levels = [
+		{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
+		{ id: 2, title: 'Числа', color: 'from-orange-400 to-red-500', icon: '🔢' },
+		// ... остальные уровни
+	];
 
-  const handleSelectLevel = (level) => {
-    setSelectedLevel(level);
-    setIsModalOpen(true);
-  };
+	const handleSelectLevel = (level) => {
+		setSelectedLevel(level);
+		setActivePlanetId(level.id);
+		
+		console.log(level.id);
+		console.log(activePlanetId);
+	};
+	const handleCloseModal = () => {
+		setSelectedLevel(null);
+		setActivePlanetId(null); // Карта сама вернется в обзорный режим
+	};
 
-  const handleStartGame = (level) => {
-    console.log("Запуск игры для уровня:", level.title);
-    setIsModalOpen(false);
-    // Тут будет переключение на экран с вопросами
-  };
+	useEffect(() => {
+		console.log("Теперь activePlanetId действительно изменился:", activePlanetId);
+	}, [activePlanetId]);
 
-  return (
-    <div className="relative">
-      <SpaceMap levels={levels} onSelectLevel={handleSelectLevel} />
-      
-      {selectedLevel && (
-        <LevelModal 
-          isOpen={isModalOpen}
-          level={selectedLevel}
-          onClose={() => setIsModalOpen(false)}
-          onStart={handleStartGame}
-        />
-      )}
-    </div>
-  );
+	const handleStartGame = (level) => {
+		console.log("Запуск игры для уровня:", level.title);
+	};
+
+	return (
+		<div className="relative">
+					
+			<SpaceMap 
+				levels={levels} 
+				onSelectLevel={handleSelectLevel} 
+				activePlanetId={activePlanetId}
+			/>
+
+			{selectedLevel && (
+				<LevelModal
+					isOpen={!!selectedLevel}
+					level={selectedLevel}
+					onClose={handleCloseModal}
+					onStart={handleStartGame}
+				/>
+			)}
+		</div>
+	);
 }
 
 export default App;
