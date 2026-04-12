@@ -8,11 +8,12 @@ import mongoose from 'mongoose';
 
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
+import { CONFIG } from './config.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = CONFIG.PORT;
 
 app.use(cors());
 app.use(express.json());
@@ -42,7 +43,7 @@ app.get('/api/levels', async (req, res) => {
 	});
 });
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/chinese_game')
+mongoose.connect(CONFIG.MONGO_URI || 'mongodb://localhost:27017/chinese_game')
   .then(() => console.log('📦 MongoDB connected'))
   .catch(err => console.error(err));
 

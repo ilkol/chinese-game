@@ -1,6 +1,7 @@
 import express from 'express';
 import { User } from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import { CONFIG } from '../config.js';
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const authenticate = (req: any, res: any, next: any) => {
 	const token = req.headers.authorization?.split(' ')[1];
 	if (!token) return res.status(401).send('Unauthorized');
 
-	jwt.verify(token, process.env.JWT_SECRET || 'secret', (err: any, decoded: any) => {
+	jwt.verify(token, CONFIG.JWT_SECRET || 'secret', (err: any, decoded: any) => {
 		if (err) return res.status(401).send('Invalid token');
 		req.userId = decoded.userId;
 		next();

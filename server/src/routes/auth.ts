@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
+import { CONFIG } from '../config.js';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.post('/login', async (req, res) => {
 	if (!user || !(await bcrypt.compare(password, user.password))) {
 		return res.status(401).json({ error: 'Неверные данные' });
 	}
-	const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET!);
+	const token = jwt.sign({ userId: user._id, role: user.role }, CONFIG.JWT_SECRET);
 	res.json({ token, username: user.username, role: user.role, progress: user.progress });
 });
 
