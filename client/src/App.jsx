@@ -21,6 +21,7 @@ function App() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLanding, setIsLanding] = useState(false);
 	const [navigationSource, setNavigationSource] = useState(null);
+	const [isImageLoaded, setIsImageLoaded] = useState(false);
 
 	const game = useGameSession(user, setUser);
 
@@ -59,6 +60,15 @@ function App() {
 
 	useEffect(() => {
 		API.getLevels().then(data => { setLevels(data); setLoading(false); });
+
+		const preloadImage = (src) => {
+			const img = new Image();
+			img.src = src;
+			img.onload = () => {
+				setIsImageLoaded(true);
+				setLoading(false); // Снимаем общий лоадер только когда и данные, и фото готовы
+			};
+		};
 	}, []);
 
 	// App.jsx

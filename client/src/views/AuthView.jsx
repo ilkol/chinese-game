@@ -40,7 +40,13 @@ const AuthView = ({ onLogin }) => {
 
 	return (
 		<div className="fixed inset-0 flex items-center justify-center p-4 bg-[#020617]">
-			<div className="fixed inset-0 z-0 opacity-40" style={{ backgroundImage: `url(${spaceBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+			<div className="fixed inset-0 z-0 opacity-40 bg-[#020617]" style={
+				{
+					backgroundImage: `url(${spaceBg})`,
+					backgroundSize: 'cover',
+					backgroundPosition: 'center'
+				}
+			} />
 
 			<motion.div
 				initial={{ y: 20, opacity: 0 }}

@@ -53,13 +53,15 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 		>
 			{/* ФОН с защитой от рамок */}
 			<motion.div
-				className="fixed inset-0 z-0 bg-[#020617]"
+				className="fixed inset-0 z-0 bg-[#020617]" // Темно-синий/черный цвет космоса
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 0.5 }} // Твоя текущая прозрачность
+				transition={{ duration: 1 }} // Картинка плавно "проявится"
 				style={{
 					backgroundImage: `url(${spaceBg})`,
 					backgroundSize: 'cover',
 					backgroundPosition: 'center',
-					opacity: 0.5,
-					scale: backgroundScale // Используем трансформированное значение
+					scale: backgroundScale
 				}}
 			/>
 
