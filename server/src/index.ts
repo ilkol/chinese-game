@@ -7,6 +7,7 @@ import type { Level } from './types.js';
 import mongoose from 'mongoose';
 
 import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/chinese_gam
   .catch(err => console.error(err));
 
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 app.listen(PORT, () => {
     console.log(`🚀 TS-Сервер запущен на http://localhost:${PORT}`);
