@@ -9,6 +9,7 @@ import TheoryReader from "./components/TheoryReader";
 import QuizView from "./views/QuizView";
 import VictoryModal from "./components/VictoryModal";
 import AuthView from "./views/AuthView";
+import TeacherView from "./views/TeacherView";
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
@@ -23,7 +24,10 @@ function App() {
 		API.getLevels().then(data => { setLevels(data); setLoading(false); });
 	}, []);
 
-	const handleStartStep = (step) => {
+	const handleStartStep = (step, levelFromTeacher = null) => {
+		if (levelFromTeacher) {
+			game.setSelectedLevel(levelFromTeacher);
+		}
 		game.setActiveStepId(step.id);
 		quiz.resetQuiz();
 		if (step.type === 'theory') {
@@ -40,39 +44,61 @@ function App() {
 
 	return (
 		<div className="min-h-screen bg-slate-50">
-			{user.role === 'teacher' ? (
-				<div className="teacher-panel">Здесь будет интерфейс учителя</div>
-			) : (
+			{/* ЛОГИКА УЧИТЕЛЯ */}
+			{user.role === 'teacher' && game.view === 'map' && (
+				<TeacherView
+					levels={levels}
+					onStartActivity={handleStartStep} // Используем ту же функцию запуска, что и у ученика
+				/>
+			)}
+
+			{/* ОБЩИЕ ИГРОВЫЕ ЭКРАНЫ (доступны и ученику, и учителю для показа на доске) */}
+			{game.view === 'theory' && (
+				<TheoryReader
+					title={game.selectedLevel?.title}
+					slides={game.selectedLevel?.theory}
+					onFinish={() => game.setView(user.role === 'teacher' ? 'map' : 'topic_menu')}
+				/>
+			)}
+
+			{game.view === 'quiz' && (
+				<QuizView
+					questionData={game.currentQuestions[quiz.currentIndex]}
+					{...quiz}
+				/>
+			)}
+
+			{/* ЛОГИКА УЧЕНИКА (Карта и Меню темы) */}
+			{user.role === 'student' && (
 				<>
 					{game.view === 'map' && (
 						<MapView
-							levels={levels} activePlanetId={game.activePlanetId}
+							levels={levels}
+							activePlanetId={game.activePlanetId}
 							onSelectLevel={(lvl) => { game.setSelectedLevel(lvl); game.setActivePlanetId(lvl.id); }}
-							isModalOpened={!!game.selectedLevel} selectedLevel={game.selectedLevel}
+							isModalOpened={!!game.selectedLevel}
+							selectedLevel={game.selectedLevel}
 							onCloseModal={() => { game.setSelectedLevel(null); game.setActivePlanetId(null); }}
 							onStartTopic={() => game.setView('topic_menu')}
 						/>
 					)}
 
 					{game.view === 'topic_menu' && (
-						<TopicMenu level={game.selectedLevel} progress={user.progress[game.selectedLevel.id] || {}}
-							onBack={() => game.setView('map')} onStartStep={handleStartStep}
+						<TopicMenu
+							level={game.selectedLevel}
+							progress={user.progress[game.selectedLevel.id] || {}}
+							onBack={() => game.setView('map')}
+							onStartStep={handleStartStep}
 						/>
 					)}
-
-					{game.view === 'theory' && (
-						<TheoryReader title={game.selectedLevel?.title} slides={game.selectedLevel?.theory}
-							onFinish={() => game.completeStep('theory')}
-						/>
-					)}
-
-					{game.view === 'quiz' && (
-						<QuizView questionData={game.currentQuestions[quiz.currentIndex]} {...quiz} />
-					)}
-
-					<VictoryModal isOpen={game.showVictory} topicTitle={game.selectedLevel?.title} onClose={() => game.setShowVictory(false)} />
 				</>
 			)}
+
+			<VictoryModal
+				isOpen={game.showVictory}
+				topicTitle={game.selectedLevel?.title}
+				onClose={() => game.setShowVictory(false)}
+			/>
 		</div>
 	);
 }
