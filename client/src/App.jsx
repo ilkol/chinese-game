@@ -139,6 +139,7 @@ function App() {
 							game.setView('map');
 						}}
 						onStartStep={handleStartStep}
+						isTeacher={user.role === 'teacher'}
 					/>
 					<VictoryModal
 						isOpen={game.showVictory}

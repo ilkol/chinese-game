@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy, LogOut } from 'lucide-react';
 
 
-const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
+const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
 	const steps = [
 		{ id: 'theory', title: 'Теория', icon: <BookOpen />, desc: 'Изучаем новые слова и правила', type: 'theory' },
 
@@ -52,8 +52,8 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
 			{/* Список этапов */}
 			<div className="w-full max-w-md flex flex-col gap-4">
 				{steps.map((step, index) => {
-					const isUnlocked = index === 0 || isStepCompleted(steps[index - 1], index - 1, progress);
-					const isCompleted = isStepCompleted(step, index, progress);
+					const isUnlocked = isTeacher ? true : index === 0 || isStepCompleted(steps[index - 1], index - 1, progress);
+					const isCompleted = isTeacher ? false : isStepCompleted(step, index, progress);
 
 					return (
 						<motion.button
@@ -98,7 +98,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
 								</p>
 							</div>
 
-							{isUnlocked && !isCompleted && (
+							{!isTeacher && isUnlocked && !isCompleted && (
 								<div className="ml-auto w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
 							)}
 						</motion.button>
