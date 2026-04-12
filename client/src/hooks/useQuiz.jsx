@@ -31,7 +31,7 @@ const useQuiz = (questions, onComplete) => {
 		setIsFinished(false);
 	};
 
-	return { currentIndex, wrongAnswers, isFinished, handleAnswer, resetQuiz };
+	return { currentIndex, wrongAnswers, isFinished, onAnswer: handleAnswer, resetQuiz };
 };
 
 export default useQuiz;
