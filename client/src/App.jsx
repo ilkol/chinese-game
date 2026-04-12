@@ -26,7 +26,7 @@ function App() {
 	const quiz = useQuiz(game.currentQuestions, async () => {
 		// Если играет УЧИТЕЛЬ
 		if (user.role === 'teacher') {
-			game.setView('map');
+			game.setView('topic_menu');
 			game.setCurrentQuestions([]); // Чистим вопросы
 			return;
 		}
@@ -66,7 +66,6 @@ function App() {
 		// Если это учитель, обновляем стейт уровня, чтобы TheoryReader его увидел
 		if (levelFromTeacher) {
 			game.setSelectedLevel(levelFromTeacher);
-			setIsModalOpen(true);
 		}
 
 		game.setActiveStepId(step.id);
