@@ -40,4 +40,9 @@ router.post('/progress', authenticate, async (req: any, res) => {
 	}
 });
 
+router.post('/getStudents', authenticate, async (req: any, res) => {
+	const users = await User.find({ role: 'student' });
+	res.json(users.map(u => ({ username: u.username, progress: u.progress })));
+});
+
 export default router;

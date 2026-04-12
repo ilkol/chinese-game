@@ -19,4 +19,6 @@ export const loginUser = (credentials) => api.post('/user/login', credentials).t
 export const saveUserProgress = (levelId, stepId) => 
   api.post('/user/progress', { levelId, stepId }).then(res => res.data);
 
+export const getStudentsProgress = () => api.post('/user/getStudents').then(res => res.data);
+
 export default api;
