@@ -26,34 +26,57 @@ function App() {
 	const [currentQuestions, setCurrentQuestions] = useState([]);
 	const [showVictory, setShowVictory] = useState(false);
 
+	const updateLocalProgress = useCallback((planetId, stepId) => {
+		const currentPlanetProgress = user?.progress?.[planetId] || {
+			theory: false,
+			final: false,
+			quizzes: []
+		};
+
+		let updatedPlanetProgress;
+
+		if (stepId.startsWith('quiz-')) {
+			// Извлекаем индекс из "quiz-0", "quiz-1"
+			const index = parseInt(stepId.split('-')[1]);
+			const newQuizzes = [...(currentPlanetProgress.quizzes || [])];
+			newQuizzes[index] = true; // Ставим true для пройденного теста
+
+			updatedPlanetProgress = {
+				...currentPlanetProgress,
+				quizzes: newQuizzes
+			};
+		} else {
+			// Для 'theory' или 'final' просто ставим флаг
+			updatedPlanetProgress = {
+				...currentPlanetProgress,
+				[stepId]: true
+			};
+		}
+
+		const updatedUser = {
+			...user,
+			progress: {
+				...user?.progress,
+				[planetId]: updatedPlanetProgress
+			}
+		};
+
+		setUser(updatedUser);
+		localStorage.setItem('user', JSON.stringify(updatedUser));
+	}, [user]);
+
 	// --- ЛОГИКА ТЕСТА (через кастомный хук) ---
 	const quiz = useQuiz(currentQuestions, async () => {
 		try {
 			await API.saveUserProgress(selectedLevel.id, activeStepId);
+			updateLocalProgress(selectedLevel.id, activeStepId);
 
-			// Правильное обновление: сохраняем структуру { planetId: { stepId: true } }
-			const updatedUser = {
-				...user,
-				progress: {
-					...user?.progress,
-					[selectedLevel.id]: {
-						...(user?.progress?.[selectedLevel.id] || {}),
-						[activeStepId]: true
-					}
-				}
-			};
-
-			setUser(updatedUser);
-			localStorage.setItem('user', JSON.stringify(updatedUser));
-
+			setView('topic_menu');
 			if (activeStepId === 'final') {
-				setView('topic_menu');
 				setTimeout(() => setShowVictory(true), 500);
-			} else {
-				setView('topic_menu');
 			}
 		} catch (e) {
-			console.error("Ошибка при сохранении прогресса:", e);
+			console.error("Ошибка при сохранении прогресса квиза:", e);
 			setView('topic_menu');
 		}
 	});
@@ -81,15 +104,22 @@ function App() {
 
 	const handleStartStep = (step) => {
 		setActiveStepId(step.id);
-		quiz.resetQuiz(); // Сбрасываем индекс и ошибки перед новым тестом
+		quiz.resetQuiz();
 
 		if (step.type === 'theory') {
 			setView('theory');
 		} else {
-			// Определяем массив вопросов
+			// Защищенный парсинг индекса: quiz-0, quiz-1...
+			const quizIndex = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
+
 			const questions = step.type === 'final'
 				? selectedLevel.final
-				: selectedLevel.quizzes[parseInt(step.id.split('-')[1]) || 0].questions;
+				: selectedLevel.quizzes?.[quizIndex]?.questions || [];
+
+			if (questions.length === 0) {
+				console.error("Вопросы не найдены для шага:", step.id);
+				return;
+			}
 
 			setCurrentQuestions(questions);
 			setView('quiz');
@@ -99,26 +129,14 @@ function App() {
 	const handleTheoryFinished = async () => {
 		try {
 			await API.saveUserProgress(selectedLevel.id, 'theory');
-
-			const updatedUser = {
-				...user,
-				progress: {
-					...user?.progress,
-					[selectedLevel.id]: {
-						...(user?.progress?.[selectedLevel.id] || {}),
-						['theory']: true
-					}
-				}
-			};
-
-			setUser(updatedUser);
-			localStorage.setItem('user', JSON.stringify(updatedUser));
+			updateLocalProgress(selectedLevel.id, 'theory');
 			setView('topic_menu');
 		} catch (e) {
 			console.error("Ошибка сохранения теории:", e);
 			setView('topic_menu');
 		}
 	};
+
 
 	// --- РЕНДЕРИНГ ---
 	if (loading) {
@@ -132,6 +150,8 @@ function App() {
 	if (!user) {
 		return <AuthView onLogin={handleLogin} />;
 	}
+
+	console.log(user);
 
 	return (
 		<div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
