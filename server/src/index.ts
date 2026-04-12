@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import type { Level } from './types.js';
+import mongoose from 'mongoose';
+
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -37,6 +40,12 @@ app.get('/api/levels', async (req, res) => {
 		res.json(levels);
 	});
 });
+
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/chinese_game')
+  .then(() => console.log('📦 MongoDB connected'))
+  .catch(err => console.error(err));
+
+app.use('/api/auth', authRouter);
 
 app.listen(PORT, () => {
     console.log(`🚀 TS-Сервер запущен на http://localhost:${PORT}`);

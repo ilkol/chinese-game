@@ -11,29 +11,125 @@ import { getLevels } from './services/api';
 import MapView from './views/MapView';
 import QuizView from './views/QuizView';
 import VictoryModal from './components/VictoryModal';
+import AuthView from './views/AuthView';
+import axios from 'axios';
 
-const LEVELS_DATA = [
-	{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
-	{ id: 2, title: 'Числа', color: 'from-orange-400 to-red-500', icon: '🔢' },
-];
+// const LEVELS_DATA = [
+// 	{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
+// 	{ id: 2, title: 'Числа', color: 'from-orange-400 to-red-500', icon: '🔢' },
+// ];
 
-const THEORY_SLIDES = [
-	{ type: 'text', header: 'Нихао!', content: 'Это самое базовое приветствие. Дословно: Ты (nǐ) + Хорошо (hǎo).' },
-	{ type: 'hanzi', char: '你好', pinyin: 'nǐ hǎo', translation: 'Привет / Здравствуйте' },
-	{ type: 'video', header: 'Тональность', url: 'https://youtube.com' }
-];
+// const THEORY_SLIDES = [
+// 	{ type: 'text', header: 'Нихао!', content: 'Это самое базовое приветствие. Дословно: Ты (nǐ) + Хорошо (hǎo).' },
+// 	{ type: 'hanzi', char: '你好', pinyin: 'nǐ hǎo', translation: 'Привет / Здравствуйте' },
+// 	{ type: 'video', header: 'Тональность', url: 'https://youtube.com' }
+// ];
+
+
+// function App() {
+
+// 	const [selectedLevel, setSelectedLevel] = useState(null);
+// 	
+// 	const [isModalOpened, setIsModalOpen] = useState(false);
+
+
+
+// 	useEffect(() => {
+// 		getLevels().then(data => {
+// 			setLevels(data);
+// 			setLoading(false);
+// 		});
+// 	}, []);
+
+// 	if (loading) {
+// 		return (
+// 			<div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-white font-bold">
+// 				ЗАГРУЗКА ВСЕЛЕННОЙ...
+// 			</div>
+// 		);
+// 	}
+
+
+// 	return (
+// 		<div className="min-h-screen bg-slate-50">
+// 			{/* 1. ЭКРАН КАРТЫ */}
+// 			{view === 'map' && (
+// 				<MapView
+// 					levels={levels}
+// 					onSelectLevel={handleSelectLevel}
+// 					activePlanetId={activePlanetId}
+
+// 					isModalOpened={isModalOpened}
+// 					selectedLevel={selectedLevel}
+// 					onCloseModal={handleCloseModal}
+// 					onStartTopic={startTopic}
+// 				/>
+// 			)}
+
+// 			{/* 2. МЕНЮ ТЕМЫ (Список шагов) */}
+// 			{view === 'topic_menu' && (
+// 				<>
+// 					<TopicMenu
+// 						level={selectedLevel}
+// 						progress={progress}
+// 						onBack={() => setView('map')}
+// 						onStartStep={handleStartStep}
+// 					/>
+// 					<VictoryModal
+// 						isOpen={showVictory}
+// 						topicTitle={selectedLevel.title}
+// 						onClose={() => {
+// 							setShowVictory(false);
+// 							setView('map'); // После победы выходим на карту
+// 						}}
+// 					/>
+// 				</>
+
+// 			)}
+
+// 			{/* 3. ЭКРАН ТЕОРИИ */}
+// 			{view === 'theory' && (
+// 				<TheoryReader
+// 					title={selectedLevel.title}
+// 					slides={selectedLevel.theory}
+// 					onFinish={completeTheory}
+// 				/>
+// 			)}
+// 			{view === 'quiz' && selectedLevel && (
+// 				<QuizView
+// 					questionData={currentQuestions[currentQuestionIndex]}
+// 					onAnswer={handleAnswer}
+// 					wrongAnswers={wrongAnswers}
+// 					isFinished={isFinished}
+// 				/>
+// 			)}
+// 		</div>
+// 	);
+// }
 
 
 function App() {
-	const [levels, setLevels] = useState([]);
+	const [user, setUser] = useState(() => {
+		const savedUser = localStorage.getItem('user');
+		return savedUser ? JSON.parse(savedUser) : null;
+	});
 	const [loading, setLoading] = useState(true);
 	const [view, setView] = useState('map'); // 'map' или 'topic'
-	const [progress, setProgress] = useState({});
-	const [activeStep, setActiveStep] = useState(null); // 'theory', 'quiz1', 'quiz2', 'final'
-	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+	const [levels, setLevels] = useState([]);
 
 	const [selectedLevel, setSelectedLevel] = useState(null);
 	const [activePlanetId, setActivePlanetId] = useState(1);
+	const [progress, setProgress] = useState(() => {
+		const savedUser = localStorage.getItem('user');
+		if (savedUser) {
+			const parsedUser = JSON.parse(savedUser);
+			return parsedUser.progress || {};
+		}
+		return {};
+	});
+
+	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+	const [activeStep, setActiveStep] = useState(null); // 'theory', 'quiz1', 'quiz2', 'final'
 	const [isModalOpened, setIsModalOpen] = useState(false);
 	const [wrongAnswers, setWrongAnswers] = useState([]);
 	const [isFinished, setIsFinished] = useState(false);
@@ -46,41 +142,16 @@ function App() {
 		setSelectedLevel(level);
 		setActivePlanetId(level.id);
 	};
+
 	const handleCloseModal = () => {
 		setIsModalOpen(false);
 		setSelectedLevel(null);
 		setActivePlanetId(null); // Карта сама вернется в обзорный режим
 	};
-
 	const startTopic = () => {
 		setIsModalOpen(false);
 		setTimeout(() => setView('topic_menu'), 300);
 		// setView('topic_menu');
-	};
-
-	const completeTheory = () => {
-		setProgress(prev => ({ ...prev, theory: true }));
-		setView('topic_menu');
-	};
-
-	const handleStartStep = (step) => {
-		setCurrentQuestionIndex(prev => prev + 1);
-		setActiveStep(step.id);
-		setWrongAnswers([]);
-		setIsFinished(false);
-		setCurrentQuestionIndex(0);
-
-		if (step.type === 'theory') {
-			setView('theory');
-		} else {
-			const index = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
-			const questions = step.type === 'final'
-				? selectedLevel.final
-				: selectedLevel.quizzes[index].questions;
-
-			setCurrentQuestions(questions)
-			setView('quiz');
-		}
 	};
 
 	const handleAnswer = (option) => {
@@ -113,22 +184,72 @@ function App() {
 	};
 
 
+	const handleStartStep = (step) => {
+		setCurrentQuestionIndex(prev => prev + 1);
+		setActiveStep(step.id);
+		setWrongAnswers([]);
+		setIsFinished(false);
+		setCurrentQuestionIndex(0);
 
+		if (step.type === 'theory') {
+			setView('theory');
+		} else {
+			const index = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
+			const questions = step.type === 'final'
+				? selectedLevel.final
+				: selectedLevel.quizzes[index].questions;
+
+			setCurrentQuestions(questions)
+			setView('quiz');
+		}
+	};
+
+
+	// Проверка сессии при загрузке
 	useEffect(() => {
 		getLevels().then(data => {
 			setLevels(data);
 			setLoading(false);
 		});
+
 	}, []);
 
-	if (loading) {
-		return (
-			<div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-white font-bold">
-				ЗАГРУЗКА ВСЕЛЕННОЙ...
-			</div>
-		);
+	const saveProgress = async (stepId) => {
+		const newProgress = { ...progress, [stepId]: true };
+		setProgress(newProgress);
+
+		try {
+			const token = localStorage.getItem('token');
+			await axios.post('http://localhost:5000/api/user/progress',
+				{ levelId: selectedLevel.id, stepId },
+				{ headers: { Authorization: `Bearer ${token}` } }
+			);
+		} catch (e) {
+			console.error("Не удалось сохранить прогресс на сервере", e);
+		}
+	};
+
+	const handleLogin = (userData) => {
+		setUser(userData);
+		setProgress(userData.progress || {});
+		localStorage.setItem('user', JSON.stringify(userData));
+		setView('map');
+	};
+
+	if (loading) return <div className="bg-[#020617] h-screen flex items-center justify-center text-white">ЗАГРУЗКА...</div>;
+
+	if (!user) {
+		return <AuthView onLogin={(userData) => {
+			setUser(userData);
+			setProgress(userData.progress || {}); // Загружаем прогресс из БД
+			setView('map');
+		}} />;
 	}
 
+	const completeTheory = () => {
+		setProgress(prev => ({ ...prev, theory: true }));
+		setView('topic_menu');
+	};
 
 	return (
 		<div className="min-h-screen bg-slate-50">
@@ -185,6 +306,7 @@ function App() {
 			)}
 		</div>
 	);
+
 }
 
 export default App;
