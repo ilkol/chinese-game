@@ -4,7 +4,7 @@ import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy } from 'luc
 const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
   const steps = [
     { id: 'theory', title: 'Теория', icon: <BookOpen />, desc: 'Изучаем новые слова и правила', type: 'theory' },
-    
+
     ...(level.quizzes || []).map((q, index) => ({
       id: `quiz-${index}`,
       title: q.title || `Тестирование ${index + 1}`,
@@ -42,15 +42,38 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
               className={`relative flex items-center p-5 rounded-3xl border-b-4 transition-all
                 ${isUnlocked ? "bg-white border-slate-200 shadow-sm" : "bg-slate-100 opacity-60 grayscale cursor-not-allowed"}`}
             >
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mr-4
-                ${isCompleted ? "bg-green-500 text-white" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200"}`}>
-                {isCompleted ? <CheckCircle2 size={24} /> : (isUnlocked ? step.icon : <Lock />)}
+              <div className="relative mr-4">
+                <div className={`
+    w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300
+    ${isCompleted ? "bg-green-100 text-green-600" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-400"}
+  `}>
+                  {/* Сама иконка этапа теперь видна ВСЕГДА */}
+                  {step.icon}
+
+                  {/* Если этап заблокирован — рисуем маленький замочек сверху */}
+                  {!isUnlocked && (
+                    <div className="absolute inset-0 bg-slate-200/50 backdrop-blur-[1px] rounded-2xl flex items-center justify-center text-slate-500">
+                      <Lock size={16} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Если этап пройден — рисуем зеленую галочку в углу (Badge) */}
+                {isCompleted && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center text-white"
+                  >
+                    <CheckCircle2 size={14} strokeWidth={3} />
+                  </motion.div>
+                )}
               </div>
 
               <div className="text-left">
                 <h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>{step.title}</h3>
                 <p className="text-xs text-slate-400">
-                    {isCompleted ? "Завершено" : isUnlocked ? "Доступно" : "Заблокировано"}
+                  {isCompleted ? "Завершено" : isUnlocked ? "Доступно" : "Заблокировано"}
                 </p>
               </div>
 
