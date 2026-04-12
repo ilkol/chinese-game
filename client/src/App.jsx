@@ -10,6 +10,7 @@ import ListeningCard from './components/ListeningCard';
 import { getLevels } from './services/api';
 import MapView from './views/MapView';
 import QuizView from './views/QuizView';
+import VictoryModal from './components/VictoryModal';
 
 const LEVELS_DATA = [
 	{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
@@ -37,6 +38,7 @@ function App() {
 	const [wrongAnswers, setWrongAnswers] = useState([]);
 	const [isFinished, setIsFinished] = useState(false);
 	const [currentQuestions, setCurrentQuestions] = useState([]);
+	const [showVictory, setShowVictory] = useState(false);
 
 
 	const handleSelectLevel = (level) => {
@@ -86,7 +88,7 @@ function App() {
 
 		if (option === currentQ.correctAnswer) {
 			setIsFinished(true);
-			setTimeout(() => {	
+			setTimeout(() => {
 				if (currentQuestionIndex < currentQuestions.length - 1) {
 					// Переход к следующему вопросу
 					setCurrentQuestionIndex(prev => prev + 1);
@@ -95,7 +97,12 @@ function App() {
 				} else {
 					// Завершение всего теста
 					setProgress(prev => ({ ...prev, [activeStep]: true }));
-					setView('topic_menu');
+					if (activeStep === 'final') {
+						setView('topic_menu'); // Возвращаемся в меню
+						setTimeout(() => setShowVictory(true), 500); // Показываем победу через полсекунды
+					} else {
+						setView('topic_menu');
+					}
 				}
 			}, 1500);
 		} else {
@@ -141,12 +148,23 @@ function App() {
 
 			{/* 2. МЕНЮ ТЕМЫ (Список шагов) */}
 			{view === 'topic_menu' && (
-				<TopicMenu
-					level={selectedLevel}
-					progress={progress}
-					onBack={() => setView('map')}
-					onStartStep={handleStartStep}
-				/>
+				<>
+					<TopicMenu
+						level={selectedLevel}
+						progress={progress}
+						onBack={() => setView('map')}
+						onStartStep={handleStartStep}
+					/>
+					<VictoryModal
+						isOpen={showVictory}
+						topicTitle={selectedLevel.title}
+						onClose={() => {
+							setShowVictory(false);
+							setView('map'); // После победы выходим на карту
+						}}
+					/>
+				</>
+
 			)}
 
 			{/* 3. ЭКРАН ТЕОРИИ */}
