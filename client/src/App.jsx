@@ -28,7 +28,7 @@ function App() {
 	const [loading, setLoading] = useState(true);
 	const [view, setView] = useState('map'); // 'map' или 'topic'
 	const [progress, setProgress] = useState({
-		theory: true,      // Теория открыта всегда
+		theory: false,      // Теория открыта всегда
 		quiz1: false,      // Тест 1 закрыт
 		quiz2: false,      // Тест 2 закрыт
 		final: false       // Итог закрыт
