@@ -45,10 +45,10 @@ const ListeningCard = ({ taskText, audioText, options, onAnswer, wrongAnswers, i
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={playAudio}
-          className="w-32 h-32 sm:w-48 sm:h-48 bg-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-200 text-white transition-colors hover:bg-blue-600"
+          className="w-16 h-16 sm:w-24 sm:h-24 bg-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-200 text-white transition-colors hover:bg-blue-600"
         >
-          <Volume2 size={64} className="sm:hidden" /> {/* Маленькая иконка для мобилок */}
-          <Volume2 size={96} className="hidden sm:block" /> {/* Большая для проектора */}
+          <Volume2 size={32} className="sm:hidden" /> {/* Маленькая иконка для мобилок */}
+          <Volume2 size={48} className="hidden sm:block" /> {/* Большая для проектора */}
         </motion.button>
 
         <p className="mt-6 text-slate-400 text-sm font-medium italic">Нажми, чтобы прослушать</p>
