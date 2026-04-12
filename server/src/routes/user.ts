@@ -13,6 +13,7 @@ const authenticate = (req: any, res: any, next: any) => {
 	jwt.verify(token, CONFIG.JWT_SECRET || 'secret', (err: any, decoded: any) => {
 		if (err) return res.status(401).send('Invalid token');
 		req.userId = decoded.userId;
+		req.role = decoded.role;
 		next();
 	});
 };
