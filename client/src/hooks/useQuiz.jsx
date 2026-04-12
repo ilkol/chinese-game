@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const useQuiz = (questions, onComplete) => {
+const useQuiz = (questions, onComplete) => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [wrongAnswers, setWrongAnswers] = useState([]);
 	const [isFinished, setIsFinished] = useState(false);
@@ -33,3 +33,5 @@ export const useQuiz = (questions, onComplete) => {
 
 	return { currentIndex, wrongAnswers, isFinished, handleAnswer, resetQuiz };
 };
+
+export default useQuiz;

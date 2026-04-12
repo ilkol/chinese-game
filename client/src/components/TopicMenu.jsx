@@ -43,7 +43,6 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
 			{/* Список этапов */}
 			<div className="w-full max-w-md flex flex-col gap-4">
 				{steps.map((step, index) => {
-					console.log(step.id.split('-')[1], progress.quizzes, progress.quizzes?.[parseInt(step.id.split('-')[1])]);
 					const isUnlocked = index === 0 || isStepCompleted(steps[index - 1], index - 1, progress);
 					const isCompleted = isStepCompleted(step, index, progress);
 
