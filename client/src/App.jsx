@@ -22,7 +22,7 @@ function App() {
 	const quiz = useQuiz(game.currentQuestions, async () => {
 		// Если играет УЧИТЕЛЬ
 		if (user.role === 'teacher') {
-			game.setView('map'); // Возвращаем в админку
+			game.setView('map');
 			game.setCurrentQuestions([]); // Чистим вопросы
 			return;
 		}
@@ -84,56 +84,85 @@ function App() {
 
 
 	if (loading) return <div className="loader">ЗАГРУЗКА...</div>;
-	if (!user) return <AuthView onLogin={(data) => { setUser(data); localStorage.setItem('user', JSON.stringify(data)); }} />;
+	if (!user) 
+		return <AuthView onLogin={(data) => { 
+			setUser(data); 
+			localStorage.setItem('user', JSON.stringify(data)); 
+			if(data.role === 'teacher') {
+				game.setView('teacher_panel');
+			} else {
+				game.setView('map');
+			}
+		}} />;
 
 	return (
 		<div className="min-h-screen bg-slate-50">
-			{/* ЛОГИКА УЧИТЕЛЯ */}
-			{user.role === 'teacher' && (
-				<>
-					{/* Если режим 'map' — показываем карту с кнопкой возврата в панель */}
-					{game.view === 'map' && (
-						<div className="relative h-screen">
-							<MapView
-								levels={levels}
-								activePlanetId={game.activePlanetId}
-								onSelectLevel={(lvl) => { game.setSelectedLevel(lvl); game.setActivePlanetId(lvl.id); }}
-								isModalOpened={!!game.selectedLevel}
-								selectedLevel={game.selectedLevel}
-								onCloseModal={() => { game.setSelectedLevel(null); game.setActivePlanetId(null); }}
-								onStartTopic={() => game.setView('topic_menu')}
-							/>
 
-							{/* Кнопка возврата в панель учителя поверх карты */}
-							<div className="absolute top-6 left-6 z-50">
-								<button
-									onClick={() => game.setView('teacher_panel')}
-									className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-blue-700 transition-all active:scale-95"
-								>
-									<LayoutDashboard size={20} />
-									Вернуться в панель
-								</button>
-							</div>
+			{/* 1. ЭКРАН КАРТЫ (Общий для всех) */}
+			{game.view === 'map' && (
+				<div className="relative h-screen">
+					<MapView
+						levels={levels}
+						activePlanetId={game.activePlanetId}
+						onSelectLevel={(lvl) => { game.setSelectedLevel(lvl); game.setActivePlanetId(lvl.id); }}
+						isModalOpened={!!game.selectedLevel}
+						selectedLevel={game.selectedLevel}
+						onCloseModal={() => { game.setSelectedLevel(null); game.setActivePlanetId(null); }}
+						onStartTopic={() => { game.setView('topic_menu'); }}
+					/>
+
+					{user.role === 'teacher' && (
+						<div className="absolute top-6 left-6 z-50">
+							<button
+								onClick={() => game.setView('teacher_panel')}
+								className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-blue-700 transition-all active:scale-95"
+							>
+								<LayoutDashboard size={20} />
+								Вернуться в панель
+							</button>
 						</div>
 					)}
+				</div>
+			)}
 
-					{/* Если режим 'teacher_panel' — показываем твою TeacherView */}
-					{game.view === 'teacher_panel' && (
-						<TeacherView
-							levels={levels}
-							onStartActivity={handleStartStep}
-							onOpenMap={() => game.setView('map')} // Передаем функцию открытия карты
-						/>
-					)}
+			{(game.view === 'topic_menu') && (
+				<>
+					<TopicMenu
+						level={game.selectedLevel}
+						// Если учитель — передаем "фейковый" прогресс, где всё true, 
+						// чтобы кнопки были активны. Если ученик — реальный.
+						progress={user.role === 'teacher'
+							? { theory: true, quiz1: true, quiz2: true, final: true, quizzes: [true, true, true, true] }
+							: (user.progress[game.selectedLevel.id] || {})
+						}
+						onBack={() => {
+							game.setView('map');
+						}}
+						onStartStep={handleStartStep}
+					/>
+					<VictoryModal
+						isOpen={game.showVictory}
+						topicTitle={game.selectedLevel?.title}
+						onClose={() => game.setShowVictory(false)}
+					/>
 				</>
 			)}
 
-			{/* ОБЩИЕ ИГРОВЫЕ ЭКРАНЫ (доступны и ученику, и учителю для показа на доске) */}
+			{/* 2. ПАНЕЛЬ УЧИТЕЛЯ */}
+			{user.role === 'teacher' && game.view === 'teacher_panel' && (
+				<TeacherView
+					levels={levels}
+					onStartActivity={handleStartStep}
+					onOpenMap={() => game.setView('map')}
+				/>
+			)}
+
+			{/* 4. ОБЩИЕ ИГРОВЫЕ ЭКРАНЫ (Теория и Квиз) */}
 			{game.view === 'theory' && (
 				<TheoryReader
 					title={game.selectedLevel?.title}
 					slides={game.selectedLevel?.theory}
-					onFinish={() => game.setView(user.role === 'teacher' ? 'map' : 'topic_menu')}
+					onFinish={() => game.setView('topic_menu')}
 				/>
 			)}
 
@@ -144,32 +173,7 @@ function App() {
 				/>
 			)}
 
-			{/* ЛОГИКА УЧЕНИКА (Карта и Меню темы) */}
-			{user.role === 'student' && (
-				<>
-					{game.view === 'map' && (
-						<MapView
-							levels={levels}
-							activePlanetId={game.activePlanetId}
-							onSelectLevel={(lvl) => { game.setSelectedLevel(lvl); game.setActivePlanetId(lvl.id); }}
-							isModalOpened={!!game.selectedLevel}
-							selectedLevel={game.selectedLevel}
-							onCloseModal={() => { game.setSelectedLevel(null); game.setActivePlanetId(null); }}
-							onStartTopic={() => game.setView('topic_menu')}
-						/>
-					)}
-
-					{game.view === 'topic_menu' && (
-						<TopicMenu
-							level={game.selectedLevel}
-							progress={user.progress[game.selectedLevel.id] || {}}
-							onBack={() => game.setView('map')}
-							onStartStep={handleStartStep}
-						/>
-					)}
-				</>
-			)}
-
+			{/* МОДАЛКА ПОБЕДЫ */}
 			<VictoryModal
 				isOpen={game.showVictory}
 				topicTitle={game.selectedLevel?.title}
@@ -177,6 +181,7 @@ function App() {
 			/>
 		</div>
 	);
+
 }
 
 export default App;

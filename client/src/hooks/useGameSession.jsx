@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import * as API from '../services/api';
 
 export const useGameSession = (user, setUser) => {
-	const [view, setView] = useState(user?.role === 'teacher' ? 'teacher_panel' : 'map');
+	const [view, setView] = useState('map');
 	const [selectedLevel, setSelectedLevel] = useState(null);
 	const [activePlanetId, setActivePlanetId] = useState(1);
 	const [activeStepId, setActiveStepId] = useState(null);
@@ -46,6 +46,7 @@ export const useGameSession = (user, setUser) => {
 		activeStepId, setActiveStepId,
 		currentQuestions, setCurrentQuestions,
 		showVictory, setShowVictory,
-		completeStep
+		completeStep,
+		updateLocalProgress
 	};
 };
