@@ -158,8 +158,9 @@ function App() {
 							{game.view === 'map' && (
 								<motion.div
 									key="map"
-									initial={{ opacity: 1 }}
-									exit={{ opacity: 0, scale: 1.2 }} // Карта чуть увеличивается при исчезновении
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0, scale: 1.1 }} // Карта плавно исчезает при входе в тему
 									transition={{ duration: 0.5 }}
 								>
 
@@ -209,10 +210,11 @@ function App() {
 
 							{(game.view === 'topic_menu') && (
 								<motion.div
-									initial={{ opacity: 0, scale: 1.5, filter: "blur(10px)" }}
+									key="topic_menu"
+									initial={{ opacity: 0, scale: 1.2, filter: "blur(10px)" }} // Эффект влета
 									animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-									transition={{ duration: 0.6, ease: "easeOut" }}
-									className="min-h-screen bg-white"
+									exit={{ opacity: 0, scale: 0.8, filter: "blur(5px)" }} // Эффект вылета (уменьшение)
+									transition={{ duration: 0.5 }}
 								>
 									<TopicMenu
 										level={game.selectedLevel}
