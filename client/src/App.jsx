@@ -27,12 +27,7 @@ function App() {
 	const [levels, setLevels] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [view, setView] = useState('map'); // 'map' или 'topic'
-	const [progress, setProgress] = useState({
-		theory: false,      // Теория открыта всегда
-		quiz1: false,      // Тест 1 закрыт
-		quiz2: false,      // Тест 2 закрыт
-		final: false       // Итог закрыт
-	});
+	const [progress, setProgress] = useState({});
 	const [activeStep, setActiveStep] = useState(null); // 'theory', 'quiz1', 'quiz2', 'final'
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -41,6 +36,7 @@ function App() {
 	const [isModalOpened, setIsModalOpen] = useState(false);
 	const [wrongAnswers, setWrongAnswers] = useState([]);
 	const [isFinished, setIsFinished] = useState(false);
+	const [currentQuestions, setCurrentQuestions] = useState([]);
 
 
 	const handleSelectLevel = (level) => {
@@ -65,21 +61,32 @@ function App() {
 		setView('topic_menu');
 	};
 
-	const handleStartStep = (stepId) => {
-		setActiveStep(stepId);
-		setCurrentQuestionIndex(0);
+	const handleStartStep = (step) => {
+		setCurrentQuestionIndex(prev => prev + 1);
+		setActiveStep(step.id);
 		setWrongAnswers([]);
 		setIsFinished(false);
-		setView(stepId === 'theory' ? 'theory' : 'quiz');
+		setCurrentQuestionIndex(0);
+
+		if (step.type === 'theory') {
+			setView('theory');
+		} else {
+			const index = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
+			const questions = step.type === 'final'
+				? selectedLevel.final
+				: selectedLevel.quizzes[index].questions;
+
+			setCurrentQuestions(questions)
+			setView('quiz');
+		}
 	};
 
 	const handleAnswer = (option) => {
-		const currentQuestions = selectedLevel[activeStep];
 		const currentQ = currentQuestions[currentQuestionIndex];
 
 		if (option === currentQ.correctAnswer) {
 			setIsFinished(true);
-			setTimeout(() => {
+			setTimeout(() => {	
 				if (currentQuestionIndex < currentQuestions.length - 1) {
 					// Переход к следующему вопросу
 					setCurrentQuestionIndex(prev => prev + 1);
@@ -105,7 +112,7 @@ function App() {
 			setLevels(data);
 			setLoading(false);
 		});
-	}, [activePlanetId]);
+	}, []);
 
 	if (loading) {
 		return (
@@ -120,7 +127,7 @@ function App() {
 		<div className="min-h-screen bg-slate-50">
 			{/* 1. ЭКРАН КАРТЫ */}
 			{view === 'map' && (
-				<MapView 
+				<MapView
 					levels={levels}
 					onSelectLevel={handleSelectLevel}
 					activePlanetId={activePlanetId}
@@ -146,13 +153,13 @@ function App() {
 			{view === 'theory' && (
 				<TheoryReader
 					title={selectedLevel.title}
-					slides={levels[selectedLevel.id - 1].theory}
+					slides={selectedLevel.theory}
 					onFinish={completeTheory}
 				/>
 			)}
 			{view === 'quiz' && selectedLevel && (
-				<QuizView 
-					questionData={selectedLevel[activeStep][currentQuestionIndex]}
+				<QuizView
+					questionData={currentQuestions[currentQuestionIndex]}
 					onAnswer={handleAnswer}
 					wrongAnswers={wrongAnswers}
 					isFinished={isFinished}

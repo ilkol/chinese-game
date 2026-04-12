@@ -3,10 +3,17 @@ import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy } from 'luc
 
 const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
   const steps = [
-    { id: 'theory', title: 'Теория', icon: <BookOpen />, desc: 'Изучаем новые слова и правила' },
-    { id: 'quiz1', title: 'Первое тестирование', icon: <PlayCircle />, desc: 'Закрепляем материал' },
-    { id: 'quiz2', title: 'Второе тестирование', icon: <PlayCircle />, desc: 'Усложненные задания' },
-    { id: 'final', title: 'Итоговый тест', icon: <Trophy />, desc: 'Проверка знаний темы' },
+    { id: 'theory', title: 'Теория', icon: <BookOpen />, desc: 'Изучаем новые слова и правила', type: 'theory' },
+    
+    ...(level.quizzes || []).map((q, index) => ({
+      id: `quiz-${index}`,
+      title: q.title || `Тестирование ${index + 1}`,
+      icon: <PlayCircle />,
+      type: 'quiz',
+      data: q.questions
+    })),
+
+    ...(level.final?.length ? [{ id: 'final', title: 'Итоговый тест', icon: <Trophy />, type: 'final' }] : [])
   ];
 
   return (
@@ -31,27 +38,20 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
               key={step.id}
               whileTap={isUnlocked ? { scale: 0.98 } : {}}
               disabled={!isUnlocked}
-              onClick={() => onStartStep(step.id)}
-              className={`
-                relative flex items-center p-5 rounded-3xl border-b-4 transition-all
-                ${isUnlocked 
-                  ? "bg-white border-slate-200 shadow-sm hover:border-blue-400" 
-                  : "bg-slate-100 border-slate-200 opacity-60 grayscale cursor-not-allowed"}
-              `}
+              onClick={() => onStartStep(step)}
+              className={`relative flex items-center p-5 rounded-3xl border-b-4 transition-all
+                ${isUnlocked ? "bg-white border-slate-200 shadow-sm" : "bg-slate-100 opacity-60 grayscale cursor-not-allowed"}`}
             >
-              {/* Иконка статуса */}
-              <div className={`
-                w-12 h-12 rounded-2xl flex items-center justify-center mr-4
-                ${isCompleted ? "bg-green-500 text-white" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-400"}
-              `}>
-                {isCompleted ? <CheckCircle2 size={24} /> : isUnlocked ? step.icon : <Lock size={24} />}
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mr-4
+                ${isCompleted ? "bg-green-500 text-white" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200"}`}>
+                {isCompleted ? <CheckCircle2 size={24} /> : (isUnlocked ? step.icon : <Lock />)}
               </div>
 
               <div className="text-left">
-                <h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>
-                  {step.title}
-                </h3>
-                <p className="text-xs text-slate-400">{step.desc}</p>
+                <h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>{step.title}</h3>
+                <p className="text-xs text-slate-400">
+                    {isCompleted ? "Завершено" : isUnlocked ? "Доступно" : "Заблокировано"}
+                </p>
               </div>
 
               {isUnlocked && !isCompleted && (

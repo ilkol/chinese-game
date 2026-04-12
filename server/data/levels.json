@@ -17,9 +17,56 @@
 				"translation": "Привет"
 			}
 		],
-		"quiz1": [
+		"quizzes": [
 			{
-				"id": "1",
+				"title": "Введение",
+				"questions": [
+					{
+						"id": "1",
+						"type": "test",
+						"question": "你好",
+						"options": [
+							"Привет",
+							"Пока",
+							"Ок",
+							"Нет"
+						],
+						"correctAnswer": "Привет"
+					},
+					{
+						"id": "2",
+						"type": "listening",
+						"audioText": "谢谢",
+						"options": [
+							"Спасибо",
+							"Друг",
+							"Дом",
+							"Мир"
+						],
+						"correctAnswer": "Спасибо"
+					}
+				]
+			},
+			{
+				"questions": [
+					{
+						"id": "2",
+						"type": "listening",
+						"audioText": "谢谢",
+						"options": [
+							"Спасибо",
+							"Друг",
+							"Дом",
+							"Мир"
+						],
+						"correctAnswer": "Спасибо"
+					}
+				]
+			}
+		],
+		"final": [
+			{
+				"id": "4",
 				"type": "test",
 				"question": "你好",
 				"options": [
@@ -29,21 +76,7 @@
 					"Нет"
 				],
 				"correctAnswer": "Привет"
-			},
-			{
-				"id": "2",
-				"type": "listening",
-				"audioText": "谢谢",
-				"options": [
-					"Спасибо",
-					"Друг",
-					"Дом",
-					"Мир"
-				],
-				"correctAnswer": "Спасибо"
 			}
-		],
-		"quiz2": [],
-		"final": []
+		]
 	}
 ]
