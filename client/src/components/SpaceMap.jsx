@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 import { Target, LogOut } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
 
-const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
+const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 	const containerRef = useRef(null);
 
 	const scale = useMotionValue(0.7);
@@ -32,11 +32,12 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
 
 	useEffect(() => {
 		if (activePlanetId) {
-			focusOnPlanet(activePlanetId, 1.3);
+			const targetScale = isLanding ? 4.0 : 1.3;
+			focusOnPlanet(activePlanetId, targetScale);
 		} else {
 			focusOnPlanet(1, 0.7);
 		}
-	}, [activePlanetId]);
+	}, [activePlanetId, isLanding]);
 
 	const handleWheel = (e) => {
 		const delta = e.deltaY > 0 ? -0.05 : 0.05;

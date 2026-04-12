@@ -58,6 +58,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
 					return (
 						<motion.button
 							key={step.id}
+							whileHover={isUnlocked ?{ x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" } : {}}
 							whileTap={isUnlocked ? { scale: 0.98 } : {}}
 							disabled={!isUnlocked}
 							onClick={() => onStartStep(step)}

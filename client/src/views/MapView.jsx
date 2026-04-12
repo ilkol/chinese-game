@@ -1,7 +1,7 @@
 import LevelModal from "../components/LevelModal";
 import SpaceMap from "../components/SpaceMap";
 
-function MapView({ levels, activePlanetId, onSelectLevel, selectedLevel, isModalOpened, onCloseModal, onStartTopic}) {
+function MapView({ levels, activePlanetId, onSelectLevel, selectedLevel, isModalOpened, onCloseModal, onStartTopic, isLanding}) {
 	
 	return (
 		<>
@@ -9,6 +9,7 @@ function MapView({ levels, activePlanetId, onSelectLevel, selectedLevel, isModal
 				levels={levels}
 				onSelectLevel={onSelectLevel}
 				activePlanetId={activePlanetId}
+				isLanding={isLanding}
 			/>
 			<LevelModal
 				isOpen={isModalOpened}
