@@ -28,15 +28,21 @@ function App() {
 
 	// --- ЛОГИКА ТЕСТА (через кастомный хук) ---
 	const quiz = useQuiz(currentQuestions, async () => {
-		// Вызывается, когда тест полностью пройден
 		try {
 			await API.saveUserProgress(selectedLevel.id, activeStepId);
 
-			// Обновляем локальный стейт пользователя, чтобы разблокировать следующую кнопку
+			// Правильное обновление: сохраняем структуру { planetId: { stepId: true } }
 			const updatedUser = {
 				...user,
-				progress: { ...user?.progress, [activeStepId]: true }
+				progress: {
+					...user?.progress,
+					[selectedLevel.id]: {
+						...(user?.progress?.[selectedLevel.id] || {}),
+						[activeStepId]: true
+					}
+				}
 			};
+
 			setUser(updatedUser);
 			localStorage.setItem('user', JSON.stringify(updatedUser));
 
@@ -48,7 +54,7 @@ function App() {
 			}
 		} catch (e) {
 			console.error("Ошибка при сохранении прогресса:", e);
-			setView('topic_menu'); // Возвращаемся в любом случае
+			setView('topic_menu');
 		}
 	});
 
@@ -91,14 +97,27 @@ function App() {
 	};
 
 	const handleTheoryFinished = async () => {
-		await API.saveUserProgress(selectedLevel.id, 'theory');
-		const updatedUser = {
-			...user,
-			progress: { ...user?.progress, ['theory']: true }
-		};
-		setUser(updatedUser);
-		localStorage.setItem('user', JSON.stringify(updatedUser));
-		setView('topic_menu');
+		try {
+			await API.saveUserProgress(selectedLevel.id, 'theory');
+
+			const updatedUser = {
+				...user,
+				progress: {
+					...user?.progress,
+					[selectedLevel.id]: {
+						...(user?.progress?.[selectedLevel.id] || {}),
+						['theory']: true
+					}
+				}
+			};
+
+			setUser(updatedUser);
+			localStorage.setItem('user', JSON.stringify(updatedUser));
+			setView('topic_menu');
+		} catch (e) {
+			console.error("Ошибка сохранения теории:", e);
+			setView('topic_menu');
+		}
 	};
 
 	// --- РЕНДЕРИНГ ---
