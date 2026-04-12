@@ -10,6 +10,7 @@ import QuizView from "./views/QuizView";
 import VictoryModal from "./components/VictoryModal";
 import AuthView from "./views/AuthView";
 import TeacherView from "./views/TeacherView";
+import { LayoutDashboard } from "lucide-react";
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
@@ -88,11 +89,43 @@ function App() {
 	return (
 		<div className="min-h-screen bg-slate-50">
 			{/* ЛОГИКА УЧИТЕЛЯ */}
-			{user.role === 'teacher' && game.view === 'map' && (
-				<TeacherView
-					levels={levels}
-					onStartActivity={handleStartStep} // Используем ту же функцию запуска, что и у ученика
-				/>
+			{user.role === 'teacher' && (
+				<>
+					{/* Если режим 'map' — показываем карту с кнопкой возврата в панель */}
+					{game.view === 'map' && (
+						<div className="relative h-screen">
+							<MapView
+								levels={levels}
+								activePlanetId={game.activePlanetId}
+								onSelectLevel={(lvl) => { game.setSelectedLevel(lvl); game.setActivePlanetId(lvl.id); }}
+								isModalOpened={!!game.selectedLevel}
+								selectedLevel={game.selectedLevel}
+								onCloseModal={() => { game.setSelectedLevel(null); game.setActivePlanetId(null); }}
+								onStartTopic={() => game.setView('topic_menu')}
+							/>
+
+							{/* Кнопка возврата в панель учителя поверх карты */}
+							<div className="absolute top-6 left-6 z-50">
+								<button
+									onClick={() => game.setView('teacher_panel')}
+									className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-blue-700 transition-all active:scale-95"
+								>
+									<LayoutDashboard size={20} />
+									Вернуться в панель
+								</button>
+							</div>
+						</div>
+					)}
+
+					{/* Если режим 'teacher_panel' — показываем твою TeacherView */}
+					{game.view === 'teacher_panel' && (
+						<TeacherView
+							levels={levels}
+							onStartActivity={handleStartStep}
+							onOpenMap={() => game.setView('map')} // Передаем функцию открытия карты
+						/>
+					)}
+				</>
 			)}
 
 			{/* ОБЩИЕ ИГРОВЫЕ ЭКРАНЫ (доступны и ученику, и учителю для показа на доске) */}

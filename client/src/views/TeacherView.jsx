@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, PlayCircle, Users, LayoutDashboard, LogOut, Trophy } from 'lucide-react';
+import { BookOpen, PlayCircle, Users, LayoutDashboard, LogOut, Trophy, MapIcon } from 'lucide-react';
 import * as API from '../services/api';
 
-const TeacherView = ({ levels, onStartActivity }) => {
+const TeacherView = ({ levels, onStartActivity, onOpenMap }) => {
 	const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' или 'students'
 	const [students, setStudents] = useState([]);
 
@@ -41,7 +41,16 @@ const TeacherView = ({ levels, onStartActivity }) => {
 						>
 							<Users size={18} /> Класс
 						</button>
+						<button
+							onClick={onOpenMap}
+							className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-blue-50 hover:text-blue-600 transition-all"
+						>
+							<MapIcon size={18} />
+							Карта курса
+						</button>
 					</nav>
+
+
 
 					<button
 						onClick={() => { localStorage.clear(); window.location.reload(); }}
