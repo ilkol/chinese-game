@@ -20,6 +20,7 @@
 		"quizzes": [
 			{
 				"title": "Введение",
+				"description": "Da",
 				"questions": [
 					{
 						"id": "1",

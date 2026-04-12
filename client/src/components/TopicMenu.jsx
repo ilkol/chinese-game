@@ -9,6 +9,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
       id: `quiz-${index}`,
       title: q.title || `Тестирование ${index + 1}`,
       icon: <PlayCircle />,
+      description: q.description,
       type: 'quiz',
       data: q.questions
     })),
@@ -47,7 +48,6 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
     w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300
     ${isCompleted ? "bg-green-100 text-green-600" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-400"}
   `}>
-                  {/* Сама иконка этапа теперь видна ВСЕГДА */}
                   {step.icon}
 
                   {/* Если этап заблокирован — рисуем маленький замочек сверху */}
@@ -73,7 +73,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
               <div className="text-left">
                 <h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>{step.title}</h3>
                 <p className="text-xs text-slate-400">
-                  {isCompleted ? "Завершено" : isUnlocked ? "Доступно" : "Заблокировано"}
+                  {step.description ? step.description : ""}
                 </p>
               </div>
 
