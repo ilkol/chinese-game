@@ -52,29 +52,29 @@
 				"questions": [
 					{
 						"id": "2",
-						"type": "listening",
-						"audioText": "谢谢",
+						"type": "blank",
+						"taskText": "Какой-то вопрос",
+						"sentence": "Очень [___] вопрос",
 						"options": [
-							"Спасибо",
-							"Друг",
-							"Дом",
-							"Мир"
+							"1",
+							"2",
+							"3",
+							"4"
 						],
-						"correctAnswer": "Спасибо"
+						"correctAnswer": "3"
 					}
 				]
 			}
 		],
 		"final": [
 			{
-				"id": "4",
-				"type": "test",
-				"question": "你好",
-				"options": [
-					"Привет",
-					"Пока",
-					"Ок",
-					"Нет"
+				"id": "1",
+				"type": "matching",
+				"pairs": [
+					{ "id": 1, "first": "1", "second": "1" },
+					{ "id": 2, "first": "2", "second": "2" },
+					{ "id": 3, "first": "3", "second": "3" },
+					{ "id": 4, "first": "4", "second": "4" }
 				],
 				"correctAnswer": "Привет"
 			}

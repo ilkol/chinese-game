@@ -2,17 +2,17 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const MatchingCard = ({ pairs, onComplete }) => {
-  const [selectedHanzi, setSelectedHanzi] = useState(null);
-  const [selectedPinyin, setSelectedPinyin] = useState(null);
+  const [selectedFirst, setSelectedFirst] = useState(null);
+  const [selectedSecond, setSelectedSecond] = useState(null);
   const [matchedIds, setMatchedIds] = useState([]);
 
   // Стабильное перемешивание один раз при создании
-  const [shuffledHanzi] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
-  const [shuffledPinyin] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
+  const [shuffledFist] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
+  const [shuffledSecond] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
 
-  const checkMatch = (hanzi, pinyin) => {
-    if (hanzi.id === pinyin.id) {
-      const newMatched = [...matchedIds, hanzi.id];
+  const checkMatch = (first, second) => {
+    if (first.id === second.id) {
+      const newMatched = [...matchedIds, first.id];
       setMatchedIds(newMatched);
       
       // Проверка на завершение всего уровня
@@ -22,32 +22,32 @@ const MatchingCard = ({ pairs, onComplete }) => {
     } else {
       // Если не совпало, даем визуальный отклик и сбрасываем
       setTimeout(() => {
-        setSelectedHanzi(null);
-        setSelectedPinyin(null);
+        setSelectedFirst(null);
+        setSelectedSecond(null);
       }, 500);
       return; 
     }
     // Сбрасываем выделение после успеха (без задержки)
-    setSelectedHanzi(null);
-    setSelectedPinyin(null);
+    setSelectedFirst(null);
+    setSelectedSecond(null);
   };
 
   const handleSelect = (type, item) => {
     if (matchedIds.includes(item.id)) return;
 
-    if (type === 'hanzi') {
-      if (selectedPinyin) {
-        setSelectedHanzi(item);
-        checkMatch(item, selectedPinyin);
+    if (type === 'first') {
+      if (selectedSecond) {
+        setSelectedFirst(item);
+        checkMatch(item, selectedSecond);
       } else {
-        setSelectedHanzi(item === selectedHanzi ? null : item);
+        setSelectedFirst(item === selectedFirst ? null : item);
       }
     } else {
-      if (selectedHanzi) {
-        setSelectedPinyin(item);
-        checkMatch(selectedHanzi, item);
+      if (selectedFirst) {
+        setSelectedSecond(item);
+        checkMatch(selectedFirst, item);
       } else {
-        setSelectedPinyin(item === selectedPinyin ? null : item);
+        setSelectedSecond(item === selectedSecond ? null : item);
       }
     }
   };
@@ -60,25 +60,25 @@ const MatchingCard = ({ pairs, onComplete }) => {
 
       <div className="grid grid-cols-2 gap-4 sm:gap-8">
         <div className="flex flex-col gap-4">
-          {shuffledHanzi.map((item) => (
+          {shuffledFist.map((item) => (
             <MatchButton 
               key={item.id}
-              text={item.hanzi}
-              isSelected={selectedHanzi?.id === item.id}
+              text={item.first}
+              isSelected={selectedFirst?.id === item.id}
               isMatched={matchedIds.includes(item.id)}
-              onClick={() => handleSelect('hanzi', item)}
+              onClick={() => handleSelect('first', item)}
             />
           ))}
         </div>
 
         <div className="flex flex-col gap-4">
-          {shuffledPinyin.map((item) => (
+          {shuffledSecond.map((item) => (
             <MatchButton 
               key={item.id}
-              text={item.pinyin}
-              isSelected={selectedPinyin?.id === item.id}
+              text={item.second}
+              isSelected={selectedSecond?.id === item.id}
               isMatched={matchedIds.includes(item.id)}
-              onClick={() => handleSelect('pinyin', item)}
+              onClick={() => handleSelect('second', item)}
             />
           ))}
         </div>
