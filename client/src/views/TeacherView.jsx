@@ -59,7 +59,7 @@ const TeacherView = ({ levels, onStartActivity }) => {
 							<LevelControlCard
 								key={level.id}
 								level={level}
-								onStart={(stepId) => onStartActivity({ id: stepId, type: stepId === 'theory' ? 'theory' : 'quiz' }, level)}
+								onStart={(stepId, type) => onStartActivity({ id: stepId, type: type }, level)}
 							/>
 						))}
 					</div>

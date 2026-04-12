@@ -18,7 +18,31 @@ function App() {
 
 	const game = useGameSession(user, setUser);
 
-	const quiz = useQuiz(game.currentQuestions, () => game.completeStep(game.activeStepId));
+	const quiz = useQuiz(game.currentQuestions, async () => {
+		// Если играет УЧИТЕЛЬ
+		if (user.role === 'teacher') {
+			game.setView('map'); // Возвращаем в админку
+			game.setCurrentQuestions([]); // Чистим вопросы
+			return;
+		}
+
+		// Если играет УЧЕНИК (твоя текущая логика)
+		try {
+			await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
+			game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
+
+			if (game.activeStepId === 'final') {
+				game.setView('topic_menu');
+				setTimeout(() => game.setShowVictory(true), 500);
+			} else {
+				game.setView('topic_menu');
+			}
+		} catch (e) {
+			console.error("Ошибка сохранения:", e);
+			game.setView('topic_menu');
+		}
+	});
+
 
 	useEffect(() => {
 		API.getLevels().then(data => { setLevels(data); setLoading(false); });
