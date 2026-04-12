@@ -24,20 +24,39 @@ function App() {
 		API.getLevels().then(data => { setLevels(data); setLoading(false); });
 	}, []);
 
+	// App.jsx
 	const handleStartStep = (step, levelFromTeacher = null) => {
+		// Берем уровень либо из аргумента (учитель), либо из стейта (ученик)
+		const targetLevel = levelFromTeacher || game.selectedLevel;
+
+		if (!targetLevel) {
+			console.error("Уровень не определен");
+			return;
+		}
+
+		// Если это учитель, обновляем стейт уровня, чтобы TheoryReader его увидел
 		if (levelFromTeacher) {
 			game.setSelectedLevel(levelFromTeacher);
 		}
+
 		game.setActiveStepId(step.id);
 		quiz.resetQuiz();
+
 		if (step.type === 'theory') {
 			game.setView('theory');
 		} else {
+			// Парсим индекс: из "quiz-0" получаем 0
 			const idx = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
-			game.setCurrentQuestions(step.type === 'final' ? game.selectedLevel.final : game.selectedLevel.quizzes?.[idx]?.questions || []);
+
+			const questions = step.id === 'final'
+				? targetLevel.final
+				: targetLevel.quizzes?.[idx]?.questions || [];
+
+			game.setCurrentQuestions(questions);
 			game.setView('quiz');
 		}
 	};
+
 
 	if (loading) return <div className="loader">ЗАГРУЗКА...</div>;
 	if (!user) return <AuthView onLogin={(data) => { setUser(data); localStorage.setItem('user', JSON.stringify(data)); }} />;
