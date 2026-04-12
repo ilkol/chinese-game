@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, PlayCircle, Users, LayoutDashboard, LogOut } from 'lucide-react';
+import { BookOpen, PlayCircle, Users, LayoutDashboard, LogOut, Trophy } from 'lucide-react';
 import * as API from '../services/api';
 
 const TeacherView = ({ levels, onStartActivity }) => {
@@ -71,38 +71,71 @@ const TeacherView = ({ levels, onStartActivity }) => {
 	);
 };
 
-// Вспомогательный компонент: Карточка управления уровнем
 const LevelControlCard = ({ level, onStart }) => (
-	<div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 flex flex-col">
+	<div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 flex flex-col h-full">
 		<div className="flex items-center gap-4 mb-6">
-			<div className={`text-4xl w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${level.color} shadow-lg`}>
+			<div className={`text-4xl w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${level.color} shadow-lg shrink-0`}>
 				{level.icon}
 			</div>
 			<div>
-				<h3 className="text-xl font-bold text-slate-800">{level.title}</h3>
-				<p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{level.quizzes?.length + 2} этапа</p>
+				<h3 className="text-xl font-bold text-slate-800 leading-tight">{level.title}</h3>
+				<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+					{level.quizzes?.length + 2} этапа
+				</p>
 			</div>
 		</div>
 
-		<div className="space-y-3">
+		<div className="space-y-3 flex-1">
+			{/* ТЕОРИЯ */}
 			<button
-				onClick={() => onStart('theory')}
-				className="w-full group flex items-center justify-between p-4 bg-blue-50 text-blue-700 rounded-2xl hover:bg-blue-600 hover:text-white transition-all"
+				onClick={() => onStart('theory', 'theory')}
+				className="w-full group flex items-center p-4 bg-blue-50 text-blue-700 rounded-2xl hover:bg-blue-600 hover:text-white transition-all text-left"
 			>
-				<span className="font-bold flex items-center gap-3"><BookOpen size={20} /> Теория</span>
-				<span className="text-[10px] font-black uppercase opacity-60 group-hover:opacity-100">Показать</span>
+				<div className="bg-blue-100 text-blue-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+					<BookOpen size={20} />
+				</div>
+				<div className="flex-1">
+					<h4 className="font-bold text-sm uppercase tracking-tight">Теория</h4>
+					<p className="text-[10px] opacity-70 leading-tight">Показать обучающие слайды на доске</p>
+				</div>
 			</button>
 
-			{level.quizzes?.map((_, idx) => (
+			{/* ПРОМЕЖУТОЧНЫЕ ТЕСТЫ */}
+			{level.quizzes?.map((quiz, idx) => (
 				<button
 					key={idx}
-					onClick={() => onStart(`quiz-${idx}`)}
-					className="w-full group flex items-center justify-between p-4 bg-slate-50 text-slate-600 rounded-2xl hover:bg-slate-800 hover:text-white transition-all"
+					onClick={() => onStart(`quiz-${idx}`, 'quiz')}
+					className="w-full group flex items-center p-4 bg-slate-50 text-slate-600 rounded-2xl hover:bg-slate-800 hover:text-white transition-all text-left"
 				>
-					<span className="font-bold flex items-center gap-3"><PlayCircle size={20} /> Тест {idx + 1}</span>
-					<span className="text-[10px] font-black uppercase opacity-40 group-hover:opacity-100">Запустить</span>
+					<div className="bg-slate-200 text-slate-500 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+						<PlayCircle size={20} />
+					</div>
+					<div className="flex-1">
+						<h4 className="font-bold text-sm uppercase tracking-tight">
+							{quiz.title || `Тест ${idx + 1}`}
+						</h4>
+						{quiz.description && (
+							<p className="text-[10px] opacity-60 leading-tight">{quiz.description}</p>
+						)}
+					</div>
 				</button>
 			))}
+
+			{/* ФИНАЛЬНЫЙ ТЕСТ */}
+			{level.final && (
+				<button
+					onClick={() => onStart('final', 'final')}
+					className="w-full group flex items-center p-4 bg-amber-50 text-amber-700 rounded-2xl hover:bg-amber-500 hover:text-white transition-all text-left border border-amber-100"
+				>
+					<div className="bg-amber-100 text-amber-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+						<Trophy size={20} />
+					</div>
+					<div className="flex-1">
+						<h4 className="font-bold text-sm uppercase tracking-tight">Итоговый тест</h4>
+						<p className="text-[10px] opacity-70 leading-tight">Проверка всех знаний по теме</p>
+					</div>
+				</button>
+			)}
 		</div>
 	</div>
 );
