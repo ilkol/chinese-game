@@ -20,14 +20,22 @@ function App() {
 	const [loading, setLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLanding, setIsLanding] = useState(false);
+	const [navigationSource, setNavigationSource] = useState(null);
 
 	const game = useGameSession(user, setUser);
 
-	const quiz = useQuiz(game.currentQuestions, async () => {
-		// Если играет УЧИТЕЛЬ
+	const handleFinishActivity = () => {
 		if (user.role === 'teacher') {
+			game.setView(navigationSource === 'map' ? 'topic_menu' : 'teacher_panel');
+		} else {
 			game.setView('topic_menu');
-			game.setCurrentQuestions([]); // Чистим вопросы
+		}
+	};
+
+	const quiz = useQuiz(game.currentQuestions, async () => {
+		if (user.role === 'teacher') {
+			handleFinishActivity();
+			game.setCurrentQuestions([]);
 			return;
 		}
 
@@ -66,6 +74,7 @@ function App() {
 		// Если это учитель, обновляем стейт уровня, чтобы TheoryReader его увидел
 		if (levelFromTeacher) {
 			game.setSelectedLevel(levelFromTeacher);
+			setNavigationSource('teacher_panel');
 		}
 
 		game.setActiveStepId(step.id);
@@ -129,13 +138,14 @@ function App() {
 									setIsModalOpen(false);
 								}}
 								onStartTopic={() => {
+									setNavigationSource('map');
 									setIsModalOpen(false);
 
 									setIsLanding(true);
 
 									setTimeout(() => {
 										game.setView('topic_menu');
-										setIsLanding(false); 
+										setIsLanding(false);
 									}, 200);
 								}}
 							/>
@@ -201,7 +211,7 @@ function App() {
 				<TheoryReader
 					title={game.selectedLevel?.title}
 					slides={game.selectedLevel?.theory}
-					onFinish={() => game.setView('topic_menu')}
+					onFinish={() => handleFinishActivity()}
 				/>
 			)}
 
