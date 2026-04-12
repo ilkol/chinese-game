@@ -13,6 +13,7 @@ import TeacherView from "./views/TeacherView";
 import { LayoutDashboard } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import GameLoader from "./components/GameLoader";
+import spaceBg from './assets/space.webp';
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
@@ -59,16 +60,30 @@ function App() {
 
 
 	useEffect(() => {
-		API.getLevels().then(data => { setLevels(data); setLoading(false); });
+		const startTime = Date.now();
+		const minLoadingTime = 1500; // Минимальное время показа лоадера в мс
 
-		const preloadImage = (src) => {
-			const img = new Image();
-			img.src = src;
-			img.onload = () => {
-				setIsImageLoaded(true);
-				setLoading(false); // Снимаем общий лоадер только когда и данные, и фото готовы
-			};
+		const finishLoading = () => {
+			const currentTime = Date.now();
+			const elapsedTime = currentTime - startTime;
+			const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+			// Ждем остаток времени, чтобы лоадер не мерцал
+			setTimeout(() => {
+				setLoading(false);
+			}, remainingTime);
 		};
+
+		// 1. Загружаем уровни
+		API.getLevels().then(data => {
+			setLevels(data);
+
+			// 2. Предзагрузка картинки
+			const img = new Image();
+			img.src = spaceBg;
+			img.onload = finishLoading;
+			img.onerror = finishLoading; // На случай ошибки всё равно убираем лоадер
+		}).catch(finishLoading);
 	}, []);
 
 	// App.jsx
