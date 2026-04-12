@@ -41,6 +41,8 @@ router.post('/progress', authenticate, async (req: any, res) => {
 });
 
 router.post('/getStudents', authenticate, async (req: any, res) => {
+	if (req.role !== 'teacher') return res.status(403).send('Доступ запрещен');
+	
 	const users = await User.find({ role: 'student' });
 	res.json(users.map(u => ({ username: u.username, progress: u.progress })));
 });
