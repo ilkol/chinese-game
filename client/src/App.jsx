@@ -8,6 +8,8 @@ import TheoryReader from './components/TheoryReader';
 import QuizCard from './components/QuizCard';
 import ListeningCard from './components/ListeningCard';
 import { getLevels } from './services/api';
+import MapView from './views/MapView';
+import QuizView from './views/QuizView';
 
 const LEVELS_DATA = [
 	{ id: 1, title: 'Приветствие', color: 'from-pink-500 to-purple-600', icon: '👋' },
@@ -56,18 +58,6 @@ function App() {
 		setIsModalOpen(false);
 		setTimeout(() => setView('topic_menu'), 300);
 		// setView('topic_menu');
-	};
-	const handleNextQuestion = () => {
-		const questions = selectedLevel[activeStep]; // Берем массив вопросов для текущего этапа
-		if (currentQuestionIndex < questions.length - 1) {
-			setCurrentQuestionIndex(prev => prev + 1);
-		} else {
-			// Если вопросы кончились — завершаем этап
-			const nextProgress = { ...progress, [activeStep]: true };
-			setProgress(nextProgress);
-			setView('topic_menu');
-			setActiveStep(null);
-		}
 	};
 
 	const completeTheory = () => {
@@ -130,19 +120,16 @@ function App() {
 		<div className="min-h-screen bg-slate-50">
 			{/* 1. ЭКРАН КАРТЫ */}
 			{view === 'map' && (
-				<>
-					<SpaceMap
-						levels={levels}
-						onSelectLevel={handleSelectLevel}
-						activePlanetId={activePlanetId}
-					/>
-					<LevelModal
-						isOpen={isModalOpened}
-						level={selectedLevel}
-						onClose={handleCloseModal}
-						onStart={startTopic}
-					/>
-				</>
+				<MapView 
+					levels={levels}
+					onSelectLevel={handleSelectLevel}
+					activePlanetId={activePlanetId}
+
+					isModalOpened={isModalOpened}
+					selectedLevel={selectedLevel}
+					onCloseModal={handleCloseModal}
+					onStartTopic={startTopic}
+				/>
 			)}
 
 			{/* 2. МЕНЮ ТЕМЫ (Список шагов) */}
@@ -164,17 +151,12 @@ function App() {
 				/>
 			)}
 			{view === 'quiz' && selectedLevel && (
-				<div className="min-h-screen flex items-center justify-center p-4">
-					{(() => {
-						const qData = selectedLevel[activeStep][currentQuestionIndex];
-						const props = { ...qData, onAnswer: handleAnswer, wrongAnswers, isFinished };
-
-						if (qData.type === 'test') return <QuizCard {...props} />;
-						if (qData.type === 'listening') return <ListeningCard {...props} />;
-						if (qData.type === 'blank') return <FillInBlanksCard {...props} />;
-						if (qData.type === 'matching') return <MatchingCard pairs={qData.pairs} onComplete={() => handleAnswer(qData.correctAnswer)} />;
-					})()}
-				</div>
+				<QuizView 
+					questionData={selectedLevel[activeStep][currentQuestionIndex]}
+					onAnswer={handleAnswer}
+					wrongAnswers={wrongAnswers}
+					isFinished={isFinished}
+				/>
 			)}
 		</div>
 	);
