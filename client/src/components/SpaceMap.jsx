@@ -1,6 +1,6 @@
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion'; // Добавили useTransform
 import { useRef, useEffect } from 'react';
-import { Target } from 'lucide-react';
+import { Target, LogOut } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
 
 const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
@@ -51,15 +51,15 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
 			className="fixed inset-0 bg-[#020617] overflow-hidden touch-none flex items-start justify-center"
 		>
 			{/* ФОН с защитой от рамок */}
-			<motion.div 
-				className="fixed inset-0 z-0 bg-[#020617]" 
+			<motion.div
+				className="fixed inset-0 z-0 bg-[#020617]"
 				style={{
-					backgroundImage: `url(${spaceBg})`, 
-					backgroundSize: 'cover', 
+					backgroundImage: `url(${spaceBg})`,
+					backgroundSize: 'cover',
 					backgroundPosition: 'center',
 					opacity: 0.5,
 					scale: backgroundScale // Используем трансформированное значение
-				}} 
+				}}
 			/>
 
 			{/* СЛОЙ 1: МАСШТАБ */}
@@ -83,7 +83,7 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
 					<svg className="absolute inset-0 w-full h-full pointer-events-none">
 						{planets.length > 0 && (
 							<path
-								d={`M ${500 + planets[0].x} ${planets[0].y + 60} ` + 
+								d={`M ${500 + planets[0].x} ${planets[0].y + 60} ` +
 									planets.slice(1).map(p => `L ${500 + p.x} ${p.y + 60}`).join(' ')}
 								fill="none" stroke="white" strokeWidth="3" strokeDasharray="10 15" className="opacity-20" />
 						)}
@@ -114,6 +114,16 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId }) => {
 				<div className="h-[1px] bg-white/10 my-1" />
 				<button onClick={() => scale.set(Math.min(scale.get() + 0.1, 1.2))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">+</button>
 				<button onClick={() => scale.set(Math.max(scale.get() - 0.1, 0.4))} className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white text-3xl hover:bg-white/20 transition-all">−</button>
+				<button
+					onClick={() => {
+						localStorage.clear();
+						window.location.reload();
+					}}
+					className="w-14 h-14 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white flex items-center justify-center hover:bg-red-500/20 transition-all shadow-2xl"
+					title="Выйти"
+				>
+					<LogOut size={24} />
+				</button>
 			</div>
 		</div>
 	);

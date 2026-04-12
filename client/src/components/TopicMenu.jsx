@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy } from 'lucide-react';
+import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy, LogOut } from 'lucide-react';
 
 
 const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
@@ -37,6 +37,15 @@ const TopicMenu = ({ level, progress, onBack, onStartStep }) => {
 					<ArrowLeft size={28} />
 				</button>
 				<h1 className="text-xl font-black uppercase tracking-tight">{level.title}</h1>
+				<button
+					onClick={() => {
+						localStorage.clear();
+						window.location.reload();
+					}}
+					className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+				>
+					<LogOut size={24} />
+				</button>
 				<div className="w-10" /> {/* для симметрии */}
 			</div>
 
