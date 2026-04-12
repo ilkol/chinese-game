@@ -137,7 +137,7 @@ function App() {
 				<>
 					<TopicMenu
 						level={selectedLevel}
-						progress={user.progress || {}}
+						progress={user.progress[selectedLevel.id] || {}}
 						onBack={() => setView('map')}
 						onStartStep={handleStartStep}
 					/>
