@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Lock, User, ArrowRight } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
+import { loginUser, registerUser } from '../services/api';
 
 const AuthView = ({ onLogin }) => {
 	const [isLogin, setIsLogin] = useState(true);
@@ -12,24 +13,15 @@ const AuthView = ({ onLogin }) => {
 		e.preventDefault();
 		setError('');
 
-		const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
 
 		try {
-			const response = await fetch(`http://localhost:5000${endpoint}`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData),
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) throw new Error(data.error || 'Ошибка');
+			const data = await (isLogin ? loginUser : registerUser)(formData);
 
 			localStorage.setItem('token', data.token);
 			onLogin(data);
 			
 		} catch (err) {
-			setError(err.message);
+			setError(err.response?.data?.error || err.message || 'Ошибка системы');
 		}
 	};
 

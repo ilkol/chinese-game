@@ -15,7 +15,8 @@ api.interceptors.request.use((config) => {
 
 
 export const getLevels = () => api.get('/levels').then(res => res.data);
-export const loginUser = (credentials) => api.post('/user/login', credentials).then(res => res.data);
+export const loginUser = (credentials) => api.post('/auth/login', credentials).then(res => res.data);
+export const registerUser = (credentials) => api.post('/auth/register', credentials).then(res => res.data);
 export const saveUserProgress = (levelId, stepId) => 
   api.post('/user/progress', { levelId, stepId }).then(res => res.data);
 
