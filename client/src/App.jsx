@@ -22,7 +22,6 @@ function App() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLanding, setIsLanding] = useState(false);
 	const [navigationSource, setNavigationSource] = useState(null);
-	const [isImageLoaded, setIsImageLoaded] = useState(false);
 
 	const game = useGameSession(user, setUser);
 
@@ -232,11 +231,6 @@ function App() {
 										onStartStep={handleStartStep}
 										isTeacher={user.role === 'teacher'}
 									/>
-									<VictoryModal
-										isOpen={game.showVictory}
-										topicTitle={game.selectedLevel?.title}
-										onClose={() => game.setShowVictory(false)}
-									/>
 								</motion.div>
 							)}
 						</AnimatePresence>
@@ -255,7 +249,18 @@ function App() {
 							<TheoryReader
 								title={game.selectedLevel?.title}
 								slides={game.selectedLevel?.theory}
-								onFinish={() => handleFinishActivity()}
+								onFinish={async () => {
+									try {
+										await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
+										
+										game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
+									} catch (e) {
+										console.error("Ошибка сохранения:", e);
+									} finally {
+										handleFinishActivity();
+									}
+
+								}}
 							/>
 						)}
 
@@ -270,7 +275,10 @@ function App() {
 						<VictoryModal
 							isOpen={game.showVictory}
 							topicTitle={game.selectedLevel?.title}
-							onClose={() => game.setShowVictory(false)}
+							onClose={() => {
+								game.setShowVictory(false);
+								game.setView('map');
+							}}
 						/>
 					</div>
 				</div>
