@@ -12,7 +12,8 @@ router.post('/register', async (req, res) => {
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const user = new User({ username, password: hashedPassword, role });
 		await user.save();
-		res.status(201).json({ message: 'Пользователь создан' });
+		const token = jwt.sign({ userId: user._id, role: user.role }, CONFIG.JWT_SECRET);
+		res.json({ token, username: user.username, role: user.role, progress: user.progress });
 	} catch (e) {
 		res.status(400).json({ error: 'Имя пользователя уже занято' });
 	}
