@@ -25,14 +25,9 @@ const AuthView = ({ onLogin }) => {
 
 			if (!response.ok) throw new Error(data.error || 'Ошибка');
 
-			if (isLogin) {
-				// Сохраняем токен в localStorage, чтобы не входить каждый раз
-				localStorage.setItem('token', data.token);
-				onLogin(data); // Передаем данные пользователя в App.jsx
-			} else {
-				alert('Регистрация успешна! Теперь войдите.');
-				setIsLogin(true);
-			}
+			localStorage.setItem('token', data.token);
+			onLogin(data);
+			
 		} catch (err) {
 			setError(err.message);
 		}
