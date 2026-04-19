@@ -10,6 +10,7 @@ import QuizView from "./views/QuizView";
 import VictoryModal from "./components/VictoryModal";
 import AuthView from "./views/AuthView";
 import TeacherView from "./views/TeacherView";
+import IntroView from "./views/IntroView";
 import { LayoutDashboard } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import GameLoader from "./components/GameLoader";
@@ -136,12 +137,17 @@ function App() {
 			</AnimatePresence>
 
 			{!loading && !user && (
-				<AuthView onLogin={(data) => {
+				<AuthView onLogin={(data, isNewUser) => {
 					setUser(data);
 					localStorage.setItem('user', JSON.stringify(data));
 					if (data.role === 'teacher') {
 						game.setView('teacher_panel');
 					} else {
+						if (isNewUser) {
+							game.setView('intro');
+						} else {
+							game.setView('map');
+						}
 						game.setView('map');
 					}
 				}} />
@@ -207,6 +213,10 @@ function App() {
 								</motion.div>
 							)}
 
+							{game.view === 'intro' && (
+								<IntroView onFinish={() => game.setView('map')} />
+							)}
+
 							{(game.view === 'topic_menu') && (
 								<motion.div
 									key="topic_menu"
@@ -252,7 +262,7 @@ function App() {
 								onFinish={async () => {
 									try {
 										await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
-										
+
 										game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
 									} catch (e) {
 										console.error("Ошибка сохранения:", e);

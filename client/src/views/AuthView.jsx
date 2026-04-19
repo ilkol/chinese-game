@@ -18,7 +18,7 @@ const AuthView = ({ onLogin }) => {
 			const data = await (isLogin ? loginUser : registerUser)(formData);
 
 			localStorage.setItem('token', data.token);
-			onLogin(data);
+			onLogin(data, !isLogin);
 			
 		} catch (err) {
 			setError(err.response?.data?.error || err.message || 'Ошибка системы');
