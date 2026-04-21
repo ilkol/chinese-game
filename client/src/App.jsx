@@ -15,6 +15,7 @@ import { LayoutDashboard } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import GameLoader from "./components/GameLoader";
 import spaceBg from './assets/space.webp';
+import OnboardingView from "./views/Onboarding";
 
 function App() {
 	const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
@@ -143,12 +144,12 @@ function App() {
 					if (data.role === 'teacher') {
 						game.setView('teacher_panel');
 					} else {
-						if (isNewUser) {
-							game.setView('intro');
-						} else {
-							game.setView('map');
-						}
-						game.setView('map');
+						game.setView('intro');
+						// if (isNewUser) {
+						// } else {
+						// 	game.setView('map');
+						// }
+						// game.setView('map');
 					}
 				}} />
 			)}
@@ -214,7 +215,11 @@ function App() {
 							)}
 
 							{game.view === 'intro' && (
-								<IntroView onFinish={() => game.setView('map')} />
+								<IntroView onFinish={() => game.setView('onboarding')} />
+							)}
+
+							{game.view === 'onboarding' && (
+								<OnboardingView onComplete={() => game.setView('map')} />
 							)}
 
 							{(game.view === 'topic_menu') && (
