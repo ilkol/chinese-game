@@ -4,6 +4,7 @@ import * as API from '../services/api';
 export const useGameSession = (user, setUser) => {
 	const [view, setView] = useState('map');
 	const [selectedLevel, setSelectedLevel] = useState(null);
+	const [selectedLevelStep, setSelectedLevelStep] = useState(null);
 	const [activePlanetId, setActivePlanetId] = useState(1);
 	const [activeStepId, setActiveStepId] = useState(null);
 	const [currentQuestions, setCurrentQuestions] = useState([]);
@@ -42,6 +43,7 @@ export const useGameSession = (user, setUser) => {
 	return {
 		view, setView,
 		selectedLevel, setSelectedLevel,
+		selectedLevelStep, setSelectedLevelStep,
 		activePlanetId, setActivePlanetId,
 		activeStepId, setActiveStepId,
 		currentQuestions, setCurrentQuestions,

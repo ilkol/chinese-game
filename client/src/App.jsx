@@ -57,6 +57,7 @@ function App() {
 			console.error("Ошибка сохранения:", e);
 			game.setView('topic_menu');
 		}
+		game.setSelectedLevelStep(null)
 	});
 
 
@@ -108,6 +109,7 @@ function App() {
 
 		if (step.type === 'theory') {
 			game.setView('theory');
+			game.setSelectedLevelStep(step)
 		} else {
 			// Парсим индекс: из "quiz-0" получаем 0
 			const idx = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
@@ -182,7 +184,8 @@ function App() {
 											isModalOpened={isModalOpen}
 											selectedLevel={game.selectedLevel}
 											onCloseModal={() => {
-												game.setSelectedLevel(null); game.setActivePlanetId(null);
+												game.setSelectedLevel(null); 
+												game.setActivePlanetId(null);
 												setIsModalOpen(false);
 											}}
 											onStartTopic={() => {
@@ -257,7 +260,7 @@ function App() {
 						{game.view === 'theory' && (
 							<TheoryReader
 								title={game.selectedLevel?.title}
-								slides={game.selectedLevel?.theory}
+								slides={game.selectedLevelStep.content}
 								onFinish={async () => {
 									try {
 										await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
