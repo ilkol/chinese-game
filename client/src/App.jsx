@@ -111,12 +111,7 @@ function App() {
 			game.setView('theory');
 			game.setSelectedLevelStep(step)
 		} else {
-			// Парсим индекс: из "quiz-0" получаем 0
-			const idx = step.id.includes('-') ? parseInt(step.id.split('-')[1]) : 0;
-
-			const questions = step.id === 'final'
-				? targetLevel.final
-				: targetLevel.quizzes?.[idx]?.questions || [];
+			const questions = step.content;
 
 			game.setCurrentQuestions(questions);
 			game.setView('quiz');

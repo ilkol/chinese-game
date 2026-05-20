@@ -56,7 +56,7 @@ export interface Level {
 
 export enum LevelStepType {
 	Theory = "theory",
-	Test = "quiz",
+	Quiz = "quiz",
 	FinalTest = "final"
 }
 
