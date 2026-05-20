@@ -76,17 +76,20 @@ function App() {
 			}, remainingTime);
 		};
 
-		// 1. Загружаем уровни
-		API.getLevels().then(data => {
-			setLevels(data);
-
-			// 2. Предзагрузка картинки
-			const img = new Image();
-			img.src = spaceBg;
-			img.onload = finishLoading;
-			img.onerror = finishLoading; // На случай ошибки всё равно убираем лоадер
-		}).catch(finishLoading);
-	}, []);
+		if(user) {
+			// 1. Загружаем уровни
+			API.getLevels().then(data => {
+				setLevels(data);
+	
+				const img = new Image();
+				img.src = spaceBg;
+				img.onload = finishLoading;
+				img.onerror = finishLoading; // На случай ошибки всё равно убираем лоадер
+			}).catch(finishLoading);
+		} else {
+			finishLoading();
+		}
+	}, [user]);
 
 	// App.jsx
 	const handleStartStep = (step, levelFromTeacher = null) => {
