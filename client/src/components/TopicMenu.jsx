@@ -39,6 +39,7 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }) => {
 	const [isLoading, setLoading] = useState(true);
 	useEffect(() => {
 		API.getLevel(level.id).then(data => {
+			console.log(data);
 			setSteps(data.steps)
 			setLoading(false)
 		}).catch(() => {
