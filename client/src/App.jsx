@@ -161,57 +161,57 @@ function App() {
 						<AnimatePresence mode="wait">
 
 							{game.view === 'map' && (
-								// <motion.div
-								// 	key="map"
-								// 	initial={{ opacity: 0 }}
-								// 	animate={{ opacity: 1 }}
-								// 	exit={{ opacity: 0, scale: 1.1 }} // Карта плавно исчезает при входе в тему
-								// 	transition={{ duration: 0.5 }}
-								// >
+								<motion.div
+									key="map"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0, scale: 1.1 }} // Карта плавно исчезает при входе в тему
+									transition={{ duration: 0.5 }}
+								>
 
-								// 	<div className="relative h-screen">
-								// 		<MapView
-								// 			levels={levels}
-								// 			isLanding={isLanding}
-								// 			activePlanetId={game.activePlanetId}
-								// 			onSelectLevel={(lvl) => {
-								// 				game.setSelectedLevel(lvl);
-								// 				game.setActivePlanetId(lvl.id);
-								// 				setIsModalOpen(true);
-								// 			}}
-								// 			isModalOpened={isModalOpen}
-								// 			selectedLevel={game.selectedLevel}
-								// 			onCloseModal={() => {
-								// 				game.setSelectedLevel(null); game.setActivePlanetId(null);
-								// 				setIsModalOpen(false);
-								// 			}}
-								// 			onStartTopic={() => {
-								// 				setNavigationSource('map');
-								// 				setIsModalOpen(false);
+									<div className="relative h-screen">
+										<MapView
+											levels={levels}
+											isLanding={isLanding}
+											activePlanetId={game.activePlanetId}
+											onSelectLevel={(lvl) => {
+												game.setSelectedLevel(lvl);
+												game.setActivePlanetId(lvl.id);
+												setIsModalOpen(true);
+											}}
+											isModalOpened={isModalOpen}
+											selectedLevel={game.selectedLevel}
+											onCloseModal={() => {
+												game.setSelectedLevel(null); game.setActivePlanetId(null);
+												setIsModalOpen(false);
+											}}
+											onStartTopic={() => {
+												setNavigationSource('map');
+												setIsModalOpen(false);
 
-								// 				setIsLanding(true);
+												setIsLanding(true);
 
-								// 				setTimeout(() => {
-								// 					game.setView('topic_menu');
-								// 					setIsLanding(false);
-								// 				}, 200);
-								// 			}}
-								// 		/>
+												setTimeout(() => {
+													game.setView('topic_menu');
+													setIsLanding(false);
+												}, 200);
+											}}
+										/>
 
-								// 		{user.role === 'teacher' && (
-								// 			<div className="absolute top-6 left-6 z-50">
-								// 				<button
-								// 					onClick={() => game.setView('teacher_panel')}
-								// 					className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-blue-700 transition-all active:scale-95"
-								// 				>
-								// 					<LayoutDashboard size={20} />
-								// 					Вернуться в панель
-								// 				</button>
-								// 			</div>
-								// 		)}
-								// 	</div>
-								// </motion.div>
-								<PuzzleMap />
+										{user.role === 'teacher' && (
+											<div className="absolute top-6 left-6 z-50">
+												<button
+													onClick={() => game.setView('teacher_panel')}
+													className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-blue-700 transition-all active:scale-95"
+												>
+													<LayoutDashboard size={20} />
+													Вернуться в панель
+												</button>
+											</div>
+										)}
+									</div>
+								</motion.div>
+								// <PuzzleMap />
 							)}
 
 							{game.view === 'intro' && (
@@ -232,12 +232,6 @@ function App() {
 								>
 									<TopicMenu
 										level={game.selectedLevel}
-										// Если учитель — передаем "фейковый" прогресс, где всё true, 
-										// чтобы кнопки были активны. Если ученик — реальный.
-										progress={user.role === 'teacher'
-											? { theory: true, quiz1: true, quiz2: true, final: true, quizzes: [true, true, true, true] }
-											: (user.progress[game.selectedLevel.id] || {})
-										}
 										onBack={() => {
 											game.setView('map');
 											game.setSelectedLevel(null);

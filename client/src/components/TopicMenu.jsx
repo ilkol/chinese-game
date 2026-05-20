@@ -1,33 +1,45 @@
 import { motion } from 'framer-motion';
 import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy, LogOut } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import * as API from '../services/api';
 
 
-const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
-	const steps = [
-		{ id: 'theory', title: 'Теория', icon: <BookOpen />, desc: 'Изучаем новые слова и правила', type: 'theory' },
+const getStepIcon = (step) => {
+	switch (step.type) {
+		case "theory":
+			return <BookOpen />
+		case "final":
+			return <Trophy />
+		default:
+			return <PlayCircle />
+	}
+}
 
-		...(level.quizzes || []).map((q, index) => ({
-			id: `quiz-${index}`,
-			title: q.title || `Тестирование ${index + 1}`,
-			icon: <PlayCircle />,
-			description: q.description,
-			type: 'quiz',
-			data: q.questions
-		})),
-
-		...(level.final?.length ? [{ id: 'final', title: 'Итоговый тест', icon: <Trophy />, type: 'final' }] : [])
-	];
-
-	const isStepCompleted = (step, index, progress) => {
-		if (step.type === 'theory' || step.type === 'final') {
-			return (progress[step.type] ?? false) === true;
-		}
-		if (step.type === 'quiz') {
-			return (progress.quizzes?.[index - 1] ?? false) === true;
-		}
-		return false;
+const isStepCompleted = (step) => {
+	return step.is_completed;
+}
+const getStepTitle = (step) => {
+	if (step.title && step.title !== "") {
+		return step.title;
 	}
 
+	switch (step.type) {
+		case "theory":
+			return "Теория"
+		case "final":
+			return `Итоговый тест`
+		default:
+			return `Тестирование`
+	}
+}
+
+const TopicMenu = ({ level, onBack, onStartStep, isTeacher }) => {
+	const [steps, setSteps] = useState([]);
+	useEffect(() => {
+		API.getLevel(level.id).then(data => {
+			setSteps(data.steps)
+		}).catch();
+	}, [level])
 
 	return (
 		<div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
@@ -52,13 +64,13 @@ const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
 			{/* Список этапов */}
 			<div className="w-full max-w-md flex flex-col gap-4">
 				{steps.map((step, index) => {
-					const isUnlocked = isTeacher ? true : index === 0 || isStepCompleted(steps[index - 1], index - 1, progress);
-					const isCompleted = isTeacher ? false : isStepCompleted(step, index, progress);
+					const isUnlocked = isTeacher ? true : index === 0 || isStepCompleted(steps[index - 1], index - 1);
+					const isCompleted = isTeacher ? false : isStepCompleted(step, index);
 
 					return (
 						<motion.button
 							key={step.id}
-							whileHover={isUnlocked ?{ x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" } : {}}
+							whileHover={isUnlocked ? { x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" } : {}}
 							whileTap={isUnlocked ? { scale: 0.98 } : {}}
 							disabled={!isUnlocked}
 							onClick={() => onStartStep(step)}
@@ -70,7 +82,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
     w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300
     ${isCompleted ? "bg-green-100 text-green-600" : isUnlocked ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-400"}
   `}>
-									{step.icon}
+									{getStepIcon(step)}
 
 									{/* Если этап заблокирован — рисуем маленький замочек сверху */}
 									{!isUnlocked && (
@@ -93,7 +105,7 @@ const TopicMenu = ({ level, progress, onBack, onStartStep, isTeacher }) => {
 							</div>
 
 							<div className="text-left">
-								<h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>{step.title}</h3>
+								<h3 className={`font-bold ${isUnlocked ? "text-slate-800" : "text-slate-400"}`}>{getStepTitle(step)}</h3>
 								<p className="text-xs text-slate-400">
 									{step.description ? step.description : ""}
 								</p>
