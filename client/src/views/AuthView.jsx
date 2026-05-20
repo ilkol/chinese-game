@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Lock, User, ArrowRight } from 'lucide-react';
+import { Rocket, Lock, User, ArrowRight, Shield } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
 import { loginUser, registerUser } from '../services/api';
 
 const AuthView = ({ onLogin }) => {
 	const [isLogin, setIsLogin] = useState(true);
-	const [formData, setFormData] = useState({ username: '', password: '' });
+	const [isTeacher, setIsTeacher] = useState(false);
+	const [formData, setFormData] = useState({ username: '', password: '', invite_code: '' });
 	const [error, setError] = useState('');
 
 	const handleSubmit = async (e) => {
@@ -19,7 +20,7 @@ const AuthView = ({ onLogin }) => {
 
 			localStorage.setItem('token', data.token);
 			onLogin(data, !isLogin);
-			
+
 		} catch (err) {
 			setError(err.response?.data?.error || err.message || 'Ошибка системы');
 		}
@@ -75,6 +76,19 @@ const AuthView = ({ onLogin }) => {
 						/>
 					</div>
 
+					{isTeacher && !isLogin && (
+						<div className="relative">
+							<Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
+							<input
+								type="text"
+								placeholder="Реферальный код"
+								className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500 transition-all"
+								value={formData.invite_code}
+								onChange={(e) => setFormData({ ...formData, invite_code: e.target.value })}
+							/>
+						</div>
+					)}
+
 					{error && <p className="text-red-400 text-sm text-center font-bold">{error}</p>}
 
 					<button className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
@@ -82,6 +96,16 @@ const AuthView = ({ onLogin }) => {
 					</button>
 				</form>
 
+				{(!isLogin && !isTeacher) && (
+					<button
+						onClick={() => {
+							setIsTeacher(!isTeacher)
+						}}
+						className="w-full mt-6 text-white/40 text-sm hover:text-white transition-colors"
+					>
+						Я учитель
+					</button>
+				)}
 				<button
 					onClick={() => setIsLogin(!isLogin)}
 					className="w-full mt-6 text-white/40 text-sm hover:text-white transition-colors"
