@@ -68,6 +68,7 @@ export interface LevelStep {
 	title: string;
 	type: LevelStepType;
 	content: StepContent[];
+	description: string;
 }
 
 export enum TheoryContentType {

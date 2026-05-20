@@ -5,7 +5,7 @@ import * as API from '../services/api';
 import GameLoader from './GameLoader';
 
 
-const getStepIcon = (step) => {
+const getStepIcon = (step: API.LevelStep) => {
 	switch (step.type) {
 		case "theory":
 			return <BookOpen />
@@ -16,10 +16,10 @@ const getStepIcon = (step) => {
 	}
 }
 
-const isStepCompleted = (step) => {
+const isStepCompleted = (step: API.LevelStep) => {
 	return step.is_completed;
 }
-const getStepTitle = (step) => {
+const getStepTitle = (step: API.LevelStep) => {
 	if (step.title && step.title !== "") {
 		return step.title;
 	}
@@ -34,13 +34,22 @@ const getStepTitle = (step) => {
 	}
 }
 
-const TopicMenu = ({ level, onBack, onStartStep, isTeacher }) => {
-	const [steps, setSteps] = useState([]);
+interface Props { 
+	level: API.Level;
+	onBack: () => void;
+	onStartStep: (_: API.LevelStep) => void;
+	isTeacher: boolean;
+}
+
+const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
+	const [steps, setSteps] = useState<API.LevelStep[]>([]);
 	const [isLoading, setLoading] = useState(true);
 	useEffect(() => {
 		API.getLevel(level.id).then(data => {
 			console.log(data);
-			setSteps(data.steps)
+			if(data.steps !== null) {
+				setSteps(data.steps)
+			}
 			setLoading(false)
 		}).catch(() => {
 			setLoading(false)
@@ -85,8 +94,8 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }) => {
 					{/* Список этапов */}
 					<div className="w-full max-w-md flex flex-col gap-4">
 						{steps.map((step, index) => {
-							const isUnlocked = isTeacher ? true : index === 0 || isStepCompleted(steps[index - 1], index - 1);
-							const isCompleted = isTeacher ? false : isStepCompleted(step, index);
+							const isUnlocked = isTeacher ? true : index === 0 || isStepCompleted(steps[index - 1]);
+							const isCompleted = isTeacher ? false : isStepCompleted(step);
 
 							return (
 								<motion.button
