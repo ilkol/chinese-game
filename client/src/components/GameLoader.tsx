@@ -1,8 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const GameLoader = ({ lightMod = false, isLoading = true }) => {
-	const [delayPassed, setDelayPassed] = useState(false);
+interface Props {
+	lightMod: boolean;
+	isLoading: boolean;
+}
+
+const GameLoader = ({ lightMod = false, isLoading = true }: Props) => {
+	const [delayPassed, setDelayPassed] = useState<boolean>(false);
 
 	useEffect(() => {
 		let timeout;
