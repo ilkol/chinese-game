@@ -30,7 +30,7 @@ export const useGameSession = (user, setUser) => {
 
 	const completeStep = async (stepId) => {
 		try {
-			await API.saveUserProgress(selectedLevel.id, stepId);
+			await API.saveUserProgress(stepId);
 			updateLocalProgress(selectedLevel.id, stepId);
 			setView('topic_menu');
 			if (stepId === 'final') setTimeout(() => setShowVictory(true), 500);

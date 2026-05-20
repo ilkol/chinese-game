@@ -44,7 +44,7 @@ function App() {
 		}
 
 		try {
-			await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
+			await API.saveUserProgress(game.activeStepId);
 			game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
 
 			if (game.activeStepId === 'final') {
@@ -263,9 +263,9 @@ function App() {
 								slides={game.selectedLevelStep.content}
 								onFinish={async () => {
 									try {
-										await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
+										await API.saveUserProgress(game.activeStepId);
 
-										game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
+										game.updateLocalProgress(game.selectedLevelStep.id, game.activeStepId);
 									} catch (e) {
 										console.error("Ошибка сохранения:", e);
 									} finally {

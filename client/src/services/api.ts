@@ -18,8 +18,8 @@ export const getLevels = () => API.get('/level').then(res => res.data as Level[]
 export const getLevel = (id: number) => API.get(`/level/${id}`).then(res => res.data as Level);
 export const loginUser = (credentials: UserLoginData) => API.post('/auth/login', credentials).then(res => res.data as User);
 export const registerUser = (credentials: UserLoginData) => API.post('/auth/register', credentials).then(res => res.data as User);
-export const saveUserProgress = (levelId: number, stepId: number) =>
-	API.post('/progress', { levelId, stepId }).then(res => {
+export const saveUserProgress = (stepId: number) =>
+	API.post('/progress', { step_id: stepId }).then(res => {
 		res.data
 		return true;
 	});
