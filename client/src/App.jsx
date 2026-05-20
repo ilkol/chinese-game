@@ -43,7 +43,6 @@ function App() {
 			return;
 		}
 
-		// Если играет УЧЕНИК (твоя текущая логика)
 		try {
 			await API.saveUserProgress(game.selectedLevel.id, game.activeStepId);
 			game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
