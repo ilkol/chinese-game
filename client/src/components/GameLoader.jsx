@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
-const GameLoader = () => (
-	<div className="h-screen bg-[#020617] flex flex-col items-center justify-center">
+const GameLoader = ({lightMod} = {lightMod: false}) => (
+	<div className={`h-screen bg-[#${lightMod ? "ffffff" : "020617"}] flex flex-col items-center justify-center`}>
 		<div className="relative">
 			{/* Внешнее кольцо */}
 			<motion.div
