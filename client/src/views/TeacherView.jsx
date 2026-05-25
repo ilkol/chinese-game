@@ -276,7 +276,7 @@ const StudentsTable = ({ students }) => {
 					</tr>
 				</thead>
 				<tbody className="divide-y divide-slate-50">
-					{students.map((s) => {
+					{(students || []).map((s) => {
 						const percentage = Math.round((s.completedSteps / s.totalSteps) * 100) || 0;
 						const date = new Date(s.updatedAt).toLocaleDateString('ru-RU', {
 							day: '2-digit',
