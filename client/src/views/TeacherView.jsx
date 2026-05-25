@@ -12,6 +12,7 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap, user }) => {
 		if (activeTab === 'students') {
 			API.getStudentsProgress().then((data) => {
 				setStudents(data)
+				console.log(data)
 			}).catch(console.error);
 		}
 	}, [activeTab]);
@@ -76,7 +77,7 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap, user }) => {
 						))}
 					</div>
 				) : (
-					<StudentsTable students={students} levels={levels} />
+					<ClassPanel students={students} levels={levels} />
 				)}
 			</main>
 		</div>
@@ -175,13 +176,13 @@ const LevelControlCard = ({ level, onStart }) => (
 );
 
 // Вспомогательный компонент: Таблица учеников
-const StudentsTable = ({ students }) => {
+const ClassPanel = ({ students }) => {
 	const [showQR, setShowQR] = useState(false);
 	const [inviteCode, setInviteCode] = useState("");
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		API.getInviteCode().then(code => {			
+		API.getInviteCode().then(code => {
 			setInviteCode(code);
 			setLoading(false)
 		}).catch(() => {
@@ -208,32 +209,7 @@ const StudentsTable = ({ students }) => {
 			</div>
 
 			{/* Основная таблица */}
-			<div className="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden">
-				<table className="w-full border-collapse">
-					<thead className="bg-slate-50 border-b border-slate-100">
-						<tr className="text-left text-slate-400 text-[10px] uppercase font-black tracking-widest">
-							<th className="p-6">Студент</th>
-							<th className="p-6">Прогресс</th>
-							<th className="p-6 text-center">Очки</th>
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-slate-100">
-						{students.map(s => (
-							<tr key={s._id} className="hover:bg-slate-50/50 transition-colors">
-								<td className="p-6 font-bold text-slate-700">{s.username}</td>
-								<td className="p-6">
-									<div className="flex gap-1.5 flex-wrap">
-										{Object.keys(s.progress || {}).map(id => (
-											<span key={id} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-[10px] font-bold">Тема {id}</span>
-										))}
-									</div>
-								</td>
-								<td className="p-6 text-center font-black text-blue-600">{s.score || 0}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+			<StudentsTable students={students} />
 
 			{/* Модальное окно с QR-кодом */}
 			{showQR && (
@@ -268,6 +244,100 @@ const StudentsTable = ({ students }) => {
 					</div>
 				</div>
 			)}
+		</div>
+	);
+};
+
+const StudentsTable = ({ students }) => {
+	// Функция для определения цвета в зависимости от прогресса
+	const getProgressColor = (current, total) => {
+		const percentage = (current / total) * 100;
+		if (percentage >= 100) return 'bg-emerald-500';
+		if (percentage >= 50) return 'bg-amber-500';
+		return 'bg-rose-500';
+	};
+
+	const getProgressBg = (current, total) => {
+		const percentage = (current / total) * 100;
+		if (percentage >= 100) return 'bg-emerald-50';
+		if (percentage >= 50) return 'bg-amber-50';
+		return 'bg-rose-50';
+	};
+
+	return (
+		<div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+			<table className="w-full border-collapse">
+				<thead>
+					<tr className="bg-slate-50/50 border-b border-slate-100 text-left text-slate-400 text-[11px] uppercase font-black tracking-[0.15em]">
+						<th className="p-6">Студент</th>
+						<th className="p-6">Текущий прогресс</th>
+						<th className="p-6">Активность</th>
+						<th className="p-6 text-right">Очки</th>
+					</tr>
+				</thead>
+				<tbody className="divide-y divide-slate-50">
+					{students.map((s) => {
+						const percentage = Math.round((s.completedSteps / s.totalSteps) * 100) || 0;
+						const date = new Date(s.updatedAt).toLocaleDateString('ru-RU', {
+							day: '2-digit',
+							month: 'short',
+							hour: '2-digit',
+							minute: '2-digit'
+						});
+
+						return (
+							<tr key={s.id} className="group hover:bg-slate-50/80 transition-all duration-300">
+								{/* Студент с мини-аватаром */}
+								<td className="p-6">
+									<div className="flex items-center gap-3">
+										<div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center text-slate-500 font-bold border-2 border-white shadow-sm">
+											{s.username.charAt(0).toUpperCase()}
+										</div>
+										<span className="font-bold text-slate-700 text-base">{s.username}</span>
+									</div>
+								</td>
+
+								{/* Визуальный прогресс */}
+								<td className="p-6">
+									<div className="flex flex-col gap-2 min-w-[200px]">
+										<div className="flex justify-between items-end">
+											<span className="text-xs font-black text-slate-400 uppercase tracking-wide">
+												{s.lastLevelTitle}
+											</span>
+											<span className={`text-xs font-black ${percentage === 100 ? 'text-emerald-500' : 'text-slate-600'}`}>
+												{s.completedSteps} / {s.totalSteps}
+											</span>
+										</div>
+										{/* Progress Bar */}
+										<div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-[2px]">
+											<div
+												className={`h-full rounded-full transition-all duration-1000 shadow-sm ${getProgressColor(s.completedSteps, s.totalSteps)}`}
+												style={{ width: `${percentage}%` }}
+											/>
+										</div>
+									</div>
+								</td>
+
+								{/* Дата активности */}
+								<td className="p-6">
+									<div className="flex flex-col">
+										<span className="text-sm font-bold text-slate-600">{date}</span>
+										<span className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">Последний вход</span>
+									</div>
+								</td>
+
+								{/* Очки - крупные и яркие */}
+								<td className="p-6 text-right">
+									<div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-2xl border border-blue-100">
+										<span className="text-lg font-black text-blue-600 leading-none">{s.coins}</span>
+										<span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">💰</span>
+									</div>
+								</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
 		</div>
 	);
 };
