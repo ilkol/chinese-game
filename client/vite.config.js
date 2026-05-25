@@ -4,8 +4,23 @@ import babel from '@rolldown/plugin-babel'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-	react(), 
-	babel({ presets: [reactCompilerPreset()] })
-  ],
+	plugins: [
+		react(),
+		babel({ presets: [reactCompilerPreset()] })
+	],
+	build: {
+		rolldownOptions: {
+			output: {
+				codeSplitting: {
+					groups: [
+						{
+							name: 'vendor',
+							test: /[\\/]node_modules[\\/]/,
+							priority: 10,
+						},
+					],
+				},
+			},
+		},
+	},
 })
