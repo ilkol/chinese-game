@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Lock, User, ArrowRight, Shield } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
-import { loginUser, registerUser } from '../services/api';
+import { getErrorMessage, loginUser, registerUser } from '../services/api';
 
 const AuthView = ({ onLogin }) => {
 	const [isLogin, setIsLogin] = useState(true);
@@ -22,7 +22,7 @@ const AuthView = ({ onLogin }) => {
 			onLogin(data, !isLogin);
 
 		} catch (err) {
-			setError(err.response?.data?.error || err.message || 'Ошибка системы');
+			setError(getErrorMessage(err.response?.data?.error) || err.message || 'Ошибка системы');
 		}
 	};
 

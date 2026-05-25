@@ -9,7 +9,9 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap }) => {
 	// Загружаем список учеников, если открыта вкладка "Класс"
 	useEffect(() => {
 		if (activeTab === 'students') {
-			API.getStudentsProgress().then(setStudents).catch(console.error);
+			API.getStudentsProgress().then((data) => {
+				setStudents(data)
+			}).catch(console.error);
 		}
 	}, [activeTab]);
 

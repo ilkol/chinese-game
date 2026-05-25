@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api'; // chinese-game-backend.onrender.com
 
 const API = axios.create({
 	baseURL: API_URL,
@@ -23,6 +23,17 @@ function prepareLoginResponse(data: any): LoginResponse {
 	}
 }
 
+export const ErrorMessages: Record<string, string> = {
+	invalid_credentials: "Неверный логин или пароль",
+	internal_server_error: "Проблемы на сервере, попробуйте позже",
+	user_already_exists: "Это имя уже занято"
+}
+
+export const getErrorMessage = (key: string): string => {
+	console.log(key)
+	return ErrorMessages[key] || "Неизвестная ошибка";
+}
+
 export const getLevels = () => API.get('/level').then(res => res.data as Level[]);
 export const getLevel = (id: number) => API.get(`/level/${id}`).then(res => res.data as Level);
 export const loginUser = (credentials: UserLoginData) => API.post('/auth/login', credentials).then(res => {
@@ -37,7 +48,7 @@ export const saveUserProgress = (stepId: number) =>
 		return true;
 	});
 
-export const getStudentsProgress = () => API.post('/user/getStudents').then(res => res.data);
+export const getStudentsProgress = () => API.get('/teacher/students').then(res => res.data);
 
 export default API;
 
