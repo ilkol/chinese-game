@@ -11,26 +11,28 @@ export const useGameSession = (user, setUser) => {
 	const [showVictory, setShowVictory] = useState(false);
 
 	const updateLocalProgress = useCallback((planetId, stepId) => {
-		const currentPlanetProgress = user?.progress?.[planetId] || { theory: false, final: false, quizzes: [] };
-		let updatedPlanetProgress;
+		// const currentPlanetProgress = user?.progress?.[planetId] || { theory: false, final: false, quizzes: [] };
+		// let updatedPlanetProgress;
 
-		if (stepId.startsWith('quiz-')) {
-			const index = parseInt(stepId.split('-')[1]);
-			const newQuizzes = [...(currentPlanetProgress.quizzes || [])];
-			newQuizzes[index] = true;
-			updatedPlanetProgress = { ...currentPlanetProgress, quizzes: newQuizzes };
-		} else {
-			updatedPlanetProgress = { ...currentPlanetProgress, [stepId]: true };
-		}
+		// console.log(user?.progress)
+		// if (stepId.startsWith('quiz-')) {
+		// 	const index = parseInt(stepId.split('-')[1]);
+		// 	const newQuizzes = [...(currentPlanetProgress.quizzes || [])];
+		// 	newQuizzes[index] = true;
+		// 	updatedPlanetProgress = { ...currentPlanetProgress, quizzes: newQuizzes };
+		// } else {
+		// 	updatedPlanetProgress = { ...currentPlanetProgress, [stepId]: true };
+		// }
 
-		const updatedUser = { ...user, progress: { ...user?.progress, [planetId]: updatedPlanetProgress } };
-		setUser(updatedUser);
-		localStorage.setItem('user', JSON.stringify(updatedUser));
+		// const updatedUser = { ...user, progress: { ...user?.progress, [planetId]: updatedPlanetProgress } };
+		// setUser(updatedUser);
+		// localStorage.setItem('user', JSON.stringify(updatedUser));
 	}, [user, setUser]);
 
 	const completeStep = async (stepId) => {
 		try {
 			await API.saveUserProgress(stepId);
+			console.log(stepId)
 			updateLocalProgress(selectedLevel.id, stepId);
 			setView('topic_menu');
 			if (stepId === 'final') setTimeout(() => setShowVictory(true), 500);

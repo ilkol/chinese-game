@@ -47,7 +47,7 @@ function App() {
 			await API.saveUserProgress(game.activeStepId);
 			game.updateLocalProgress(game.selectedLevel.id, game.activeStepId);
 
-			if (game.activeStepId === 'final') {
+			if (game.selectedLevelStep.type === 'final') {
 				game.setView('topic_menu');
 				setTimeout(() => game.setShowVictory(true), 500);
 			} else {
@@ -110,14 +110,15 @@ function App() {
 		game.setActiveStepId(step.id);
 		quiz.resetQuiz();
 
+		game.setSelectedLevelStep(step)
 		if (step.type === 'theory') {
 			game.setView('theory');
-			game.setSelectedLevelStep(step)
 		} else {
 			const questions = step.content;
 
 			game.setCurrentQuestions(questions);
 			game.setView('quiz');
+			
 		}
 	};
 
