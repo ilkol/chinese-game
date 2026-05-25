@@ -249,6 +249,7 @@ function App() {
 						{/* 2. ПАНЕЛЬ УЧИТЕЛЯ */}
 						{user.role === 'teacher' && game.view === 'teacher_panel' && (
 							<TeacherView
+								user={user}
 								levels={levels}
 								onStartActivity={handleStartStep}
 								onOpenMap={() => game.setView('map')}

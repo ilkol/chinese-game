@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, PlayCircle, Users, LayoutDashboard, LogOut, Trophy, MapIcon } from 'lucide-react';
 import * as API from '../services/api';
+import { QRCodeSVG } from 'qrcode.react';
 
-const TeacherView = ({ levels, onStartActivity, onOpenMap }) => {
+const TeacherView = ({ levels, onStartActivity, onOpenMap, user }) => {
 	const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' или 'students'
 	const [students, setStudents] = useState([]);
 
@@ -174,33 +175,101 @@ const LevelControlCard = ({ level, onStart }) => (
 );
 
 // Вспомогательный компонент: Таблица учеников
-const StudentsTable = ({ students }) => (
-	<div className="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden">
-		<table className="w-full border-collapse">
-			<thead className="bg-slate-50 border-b border-slate-100">
-				<tr className="text-left text-slate-400 text-[10px] uppercase font-black tracking-widest">
-					<th className="p-6">Студент</th>
-					<th className="p-6">Прогресс</th>
-					<th className="p-6 text-center">Очки</th>
-				</tr>
-			</thead>
-			<tbody className="divide-y divide-slate-100">
-				{students.map(s => (
-					<tr key={s._id} className="hover:bg-slate-50/50 transition-colors">
-						<td className="p-6 font-bold text-slate-700">{s.username}</td>
-						<td className="p-6">
-							<div className="flex gap-1.5 flex-wrap">
-								{Object.keys(s.progress || {}).map(id => (
-									<span key={id} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-[10px] font-bold">Тема {id}</span>
-								))}
-							</div>
-						</td>
-						<td className="p-6 text-center font-black text-blue-600">{s.score || 0}</td>
-					</tr>
-				))}
-			</tbody>
-		</table>
-	</div>
-);
+const StudentsTable = ({ students }) => {
+	const [showQR, setShowQR] = useState(false);
+	const [inviteCode, setInviteCode] = useState("");
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		API.getInviteCode().then(code => {			
+			setInviteCode(code);
+			setLoading(false)
+		}).catch(() => {
+		});
+	})
+
+	return (
+		<div className="space-y-4">
+			{/* Верхняя панель с кнопкой */}
+			<div className="flex justify-between items-center px-2">
+				<h2 className="text-xl font-bold text-slate-800">Список студентов</h2>
+				<button
+					disabled={loading}
+					onClick={() => {
+						setShowQR(true)
+					}}
+					className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-blue-200 active:scale-95"
+				>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					Пригласить класс
+				</button>
+			</div>
+
+			{/* Основная таблица */}
+			<div className="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden">
+				<table className="w-full border-collapse">
+					<thead className="bg-slate-50 border-b border-slate-100">
+						<tr className="text-left text-slate-400 text-[10px] uppercase font-black tracking-widest">
+							<th className="p-6">Студент</th>
+							<th className="p-6">Прогресс</th>
+							<th className="p-6 text-center">Очки</th>
+						</tr>
+					</thead>
+					<tbody className="divide-y divide-slate-100">
+						{students.map(s => (
+							<tr key={s._id} className="hover:bg-slate-50/50 transition-colors">
+								<td className="p-6 font-bold text-slate-700">{s.username}</td>
+								<td className="p-6">
+									<div className="flex gap-1.5 flex-wrap">
+										{Object.keys(s.progress || {}).map(id => (
+											<span key={id} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-[10px] font-bold">Тема {id}</span>
+										))}
+									</div>
+								</td>
+								<td className="p-6 text-center font-black text-blue-600">{s.score || 0}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			{/* Модальное окно с QR-кодом */}
+			{showQR && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+					<div className="bg-white p-8 rounded-[40px] shadow-2xl max-w-sm w-full text-center relative animate-in fade-in zoom-in duration-300">
+						<button
+							onClick={() => setShowQR(false)}
+							className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+						>
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+
+						<h3 className="text-2xl font-black text-slate-800 mb-2">Вход в игру</h3>
+						<p className="text-slate-500 mb-8 text-sm font-medium">Отсканируйте код, чтобы присоединиться</p>
+
+						<div className="bg-slate-50 p-6 rounded-[32px] inline-block mb-6 border border-slate-100">
+							<QRCodeSVG
+								value={inviteCode}
+								size={200}
+								level={"H"}
+								includeMargin={false}
+								className="mx-auto"
+							/>
+						</div>
+
+						<div className="space-y-1">
+							<p className="text-xs text-slate-400 uppercase font-black tracking-tighter">Код приглашения</p>
+							<p className="text-3xl font-black text-blue-600 tracking-widest">{inviteCode}</p>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
 
 export default TeacherView;
