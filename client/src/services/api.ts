@@ -50,6 +50,7 @@ export const saveUserProgress = (stepId: number) =>
 
 export const getStudentsProgress = () => API.get('/teacher/students').then(res => res.data);
 export const getInviteCode = () => API.get(`/teacher/invite-code`).then(res => res.data as string);
+export const joinStudentToTeacher = (code: string) => API.post(`/user/join`, { invite_code: code} ).then(res => res.data.status as string);
 
 export default API;
 

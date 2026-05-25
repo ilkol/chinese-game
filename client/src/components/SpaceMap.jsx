@@ -1,7 +1,9 @@
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion'; // Добавили useTransform
-import { useRef, useEffect } from 'react';
-import { Target, LogOut } from 'lucide-react';
+import { useRef, useEffect, useState } from 'react';
+import { Target, LogOut, QrCode, X, ArrowRight } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import * as api from '../services/api';
 
 const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 	const containerRef = useRef(null);
@@ -10,9 +12,6 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 	const x = useMotionValue(0);
 	const y = useMotionValue(0);
 
-	// ХИТРОСТЬ: Фон будет зумиться очень слабо.
-	// Когда масштаб карты от 0.4 до 1.2, масштаб фона будет от 1.1 до 1.3.
-	// Это гарантирует отсутствие рамок и дает эффект глубины.
 	const backgroundScale = useTransform(scale, [0.4, 1.2], [1.1, 1.3]);
 
 	const planets = levels.map((level, index) => ({
@@ -44,6 +43,49 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 		const currentScale = scale.get();
 		scale.set(Math.min(Math.max(currentScale + delta, 0.4), 1.2));
 	};
+
+	const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+	useEffect(() => {
+		if (isScannerOpen) {
+			const scanner = new Html5QrcodeScanner("reader", {
+				fps: 10,
+				qrbox: { width: 250, height: 250 },
+			});
+
+			scanner.render(async (decodedText) => {
+				try {
+					setError("");
+					await api.joinStudentToTeacher(decodedText)
+					setIsScannerOpen(false);
+					scanner.clear();
+				} catch (e) {
+					setError("Неверный QR-код или ошибка сервера");
+				}
+			}, (error) => {
+
+			});
+
+			return () => scanner.clear();
+		}
+	}, [isScannerOpen]);
+
+	const [manualCode, setManualCode] = useState("");
+
+	const handleJoin = async (code) => {
+		if (!code) return;
+		try {
+			setError("");
+			await api.joinStudentToTeacher(code)
+			setIsScannerOpen(false);
+			setManualCode("");
+		} catch (e) {
+			console.log()
+			setError("Код не найден. Проверьте символы.");
+		}
+
+	};
+	const [error, setError] = useState("");
 
 	return (
 		<div
@@ -111,6 +153,14 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 
 			{/* Оверлей управления */}
 			<div className="absolute bottom-10 right-10 flex flex-col gap-4 z-20">
+				<button
+					onClick={() => setIsScannerOpen(true)}
+					className="w-14 h-14 bg-purple-600 border border-purple-400 rounded-full text-white flex items-center justify-center shadow-2xl hover:bg-purple-500 active:scale-90 transition-all"
+					title="Сканировать код"
+				>
+					<QrCode size={28} />
+				</button>
+
 				<button onClick={() => focusOnPlanet(activePlanetId || 1)} className="w-14 h-14 bg-blue-600 border border-blue-400 rounded-full text-white flex items-center justify-center shadow-2xl hover:bg-blue-500 active:scale-90 transition-all">
 					<Target size={28} />
 				</button>
@@ -128,6 +178,74 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 					<LogOut size={24} />
 				</button>
 			</div>
+
+			{isScannerOpen && (
+				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+					<div className="bg-slate-900 border border-white/20 p-6 rounded-[32px] w-full max-w-sm relative shadow-2xl">
+						{/* Кнопка закрытия */}
+						<button
+							onClick={() => setIsScannerOpen(false)}
+							className="absolute top-5 right-5 text-white/40 hover:text-white transition-colors"
+						>
+							<X size={24} />
+						</button>
+
+						<h2 className="text-white text-xl font-bold mb-6 text-center">Вход в класс</h2>
+
+						{/* Область сканера */}
+						<div id="reader" className="overflow-hidden rounded-2xl bg-black border border-white/10 mb-6"></div>
+
+						{/* Разделитель */}
+						<div className="flex items-center gap-4 mb-6">
+							<div className="h-[1px] flex-1 bg-white/10"></div>
+							<span className="text-white/30 text-xs font-bold uppercase tracking-widest">или введите код</span>
+							<div className="h-[1px] flex-1 bg-white/10"></div>
+						</div>
+
+						<div className="h-6 mb-2 flex items-center justify-center">
+							{error && (
+								<motion.span
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
+									className="text-red-400 text-[10px] uppercase font-black bg-red-400/10 px-3 py-1 rounded-full border border-red-400/20 tracking-wider"
+								>
+									{error}
+								</motion.span>
+							)}
+						</div>
+
+						{/* Ручной ввод с анимацией тряски */}
+						<motion.div
+							animate={error ? { x: [-2, 2, -2, 2, 0] } : {}}
+							transition={{ duration: 0.4 }}
+							className="relative group"
+						>
+							<input
+								type="text"
+								value={manualCode}
+								onChange={(e) => {
+									setManualCode(e.target.value);
+									if (error) setError("");
+								}}
+								placeholder="Код"
+								className={`w-full bg-white/5 border ${error ? 'border-red-500/40 shadow-[0_0_15px_rgba(248,113,113,0.1)]' : 'border-white/10'} rounded-2xl py-4 px-6 text-white text-center text-xl font-black tracking-[0.2em] focus:outline-none focus:border-purple-500/50 transition-all placeholder:tracking-normal placeholder:font-medium`}
+							/>
+							{manualCode.length > 0 && (
+								<button
+									onClick={() => handleJoin(manualCode)}
+									className="absolute right-2 top-2 bottom-2 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all flex items-center justify-center"
+								>
+									<ArrowRight size={20} />
+								</button>
+							)}
+						</motion.div>
+
+						<p className="mt-6 text-center text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+							Спросите код у вашего учителя
+						</p>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
