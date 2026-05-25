@@ -78,7 +78,7 @@ function App() {
 
 		if(user) {
 			// 1. Загружаем уровни
-			API.getLevels().then(data => {
+			API.getLevels(user.role === 'teacher').then(data => {
 				setLevels(data);
 	
 				const img = new Image();

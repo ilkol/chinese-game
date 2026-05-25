@@ -70,7 +70,7 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap }) => {
 							<LevelControlCard
 								key={level.id}
 								level={level}
-								onStart={(stepId, type) => onStartActivity({ id: stepId, type: type }, level)}
+								onStart={(step) => onStartActivity(step, level)}
 							/>
 						))}
 					</div>
@@ -82,6 +82,20 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap }) => {
 	);
 };
 
+const getStepsCountForm = (count) => {
+	if (count >= 11 && count <= 14) {
+		return "этапов"
+	}
+	const last = count % 10;
+	if (last == 1) {
+		return "этап"
+	}
+	if (last == 2 || last == 3 || last == 4) {
+		return "этапа"
+	}
+	return "этапов"
+}
+
 const LevelControlCard = ({ level, onStart }) => (
 	<div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 flex flex-col h-full">
 		<div className="flex items-center gap-4 mb-6">
@@ -91,62 +105,70 @@ const LevelControlCard = ({ level, onStart }) => (
 			<div>
 				<h3 className="text-xl font-bold text-slate-800 leading-tight">{level.title}</h3>
 				<p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-					{level.quizzes?.length + 2} этапа
+					{level.steps.length} {`${getStepsCountForm(level.steps.length)}`}
 				</p>
 			</div>
 		</div>
 
 		<div className="space-y-3 flex-1">
-			{/* ТЕОРИЯ */}
-			<button
-				onClick={() => onStart('theory', 'theory')}
-				className="w-full group flex items-center p-4 bg-blue-50 text-blue-700 rounded-2xl hover:bg-blue-600 hover:text-white transition-all text-left"
-			>
-				<div className="bg-blue-100 text-blue-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
-					<BookOpen size={20} />
-				</div>
-				<div className="flex-1">
-					<h4 className="font-bold text-sm uppercase tracking-tight">Теория</h4>
-					<p className="text-[10px] opacity-70 leading-tight">Показать обучающие слайды на доске</p>
-				</div>
-			</button>
 
 			{/* ПРОМЕЖУТОЧНЫЕ ТЕСТЫ */}
-			{level.quizzes?.map((quiz, idx) => (
-				<button
-					key={idx}
-					onClick={() => onStart(`quiz-${idx}`, 'quiz')}
-					className="w-full group flex items-center p-4 bg-slate-50 text-slate-600 rounded-2xl hover:bg-slate-800 hover:text-white transition-all text-left"
-				>
-					<div className="bg-slate-200 text-slate-500 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
-						<PlayCircle size={20} />
-					</div>
-					<div className="flex-1">
-						<h4 className="font-bold text-sm uppercase tracking-tight">
-							{quiz.title || `Тест ${idx + 1}`}
-						</h4>
-						{quiz.description && (
-							<p className="text-[10px] opacity-60 leading-tight">{quiz.description}</p>
-						)}
-					</div>
-				</button>
-			))}
+			{level.steps.map((quiz, idx) => {
+				if (quiz.type === "final") {
+					return (
+						<button
+							key={idx}
+							onClick={() => onStart(quiz)}
+							className="w-full group flex items-center p-4 bg-amber-50 text-amber-700 rounded-2xl hover:bg-amber-500 hover:text-white transition-all text-left border border-amber-100"
+						>
+							<div className="bg-amber-100 text-amber-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+								<Trophy size={20} />
+							</div>
+							<div className="flex-1">
+								<h4 className="font-bold text-sm uppercase tracking-tight">Итоговый тест</h4>
+								<p className="text-[10px] opacity-70 leading-tight">Проверка всех знаний по теме</p>
+							</div>
+						</button>
+					)
+				}
+				if (quiz.type === "theory") {
+					return (
+						<button
+							key={idx}
+							onClick={() => onStart(quiz)}
+							className="w-full group flex items-center p-4 bg-blue-50 text-blue-700 rounded-2xl hover:bg-blue-600 hover:text-white transition-all text-left"
+						>
+							<div className="bg-blue-100 text-blue-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+								<BookOpen size={20} />
+							</div>
+							<div className="flex-1">
+								<h4 className="font-bold text-sm uppercase tracking-tight">Теория</h4>
+								<p className="text-[10px] opacity-70 leading-tight">Показать обучающие слайды на доске</p>
+							</div>
+						</button>
+					)
+				}
 
-			{/* ФИНАЛЬНЫЙ ТЕСТ */}
-			{level.final && (
-				<button
-					onClick={() => onStart('final', 'final')}
-					className="w-full group flex items-center p-4 bg-amber-50 text-amber-700 rounded-2xl hover:bg-amber-500 hover:text-white transition-all text-left border border-amber-100"
-				>
-					<div className="bg-amber-100 text-amber-600 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
-						<Trophy size={20} />
-					</div>
-					<div className="flex-1">
-						<h4 className="font-bold text-sm uppercase tracking-tight">Итоговый тест</h4>
-						<p className="text-[10px] opacity-70 leading-tight">Проверка всех знаний по теме</p>
-					</div>
-				</button>
-			)}
+				return (
+					<button
+						key={idx}
+						onClick={() => onStart(quiz)}
+						className="w-full group flex items-center p-4 bg-slate-50 text-slate-600 rounded-2xl hover:bg-slate-800 hover:text-white transition-all text-left"
+					>
+						<div className="bg-slate-200 text-slate-500 p-2 rounded-xl mr-4 group-hover:bg-white/20 group-hover:text-white transition-colors">
+							<PlayCircle size={20} />
+						</div>
+						<div className="flex-1">
+							<h4 className="font-bold text-sm uppercase tracking-tight">
+								{quiz.title || `Тест ${idx + 1}`}
+							</h4>
+							{quiz.description && (
+								<p className="text-[10px] opacity-60 leading-tight">{quiz.description}</p>
+							)}
+						</div>
+					</button>
+				)
+			})}
 		</div>
 	</div>
 );
