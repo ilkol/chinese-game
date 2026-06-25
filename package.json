@@ -13,5 +13,8 @@
   "type": "commonjs",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1"
   }
 }
