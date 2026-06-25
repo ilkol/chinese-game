@@ -191,7 +191,7 @@ const DelayedVideo = ({ src, muted }: { src: string, muted: boolean}) => {
   );
 };
 
-const LevelIntroView = ({ onComplete }: { onComplete: () => void }) => {
+const DialogView = ({ onComplete }: { onComplete: () => void }) => {
 	const [currentStep, setCurrentStep] = useState(0);
 
 
@@ -308,4 +308,4 @@ const LevelIntroView = ({ onComplete }: { onComplete: () => void }) => {
 	);
 };
 
-export default LevelIntroView;
+export default DialogView;

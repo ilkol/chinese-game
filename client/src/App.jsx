@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import GameLoader from "./components/GameLoader";
 import spaceBg from './assets/space.webp';
 import OnboardingView from "./views/Onboarding";
+import DialogView from "./views/DialogView";
 import PuzzleMap from "./views/CollectionView";
 
 function App() {
@@ -111,8 +112,8 @@ function App() {
 		quiz.resetQuiz();
 
 		game.setSelectedLevelStep(step)
-		if (step.type === 'theory') {
-			game.setView('theory');
+		if (step.type === 'theory' || step.type === 'dialog') {
+			game.setView(step.type);
 		} else {
 			const questions = step.content;
 
@@ -222,6 +223,20 @@ function App() {
 
 							{game.view === 'onboarding' && (
 								<OnboardingView onComplete={() => game.setView('map')} />
+							)}
+							{game.view === 'dialog' && (
+								<DialogView onComplete={async () => {
+									try {
+										await API.saveUserProgress(game.activeStepId);
+
+										game.updateLocalProgress(game.selectedLevelStep.id, game.activeStepId);
+									} catch (e) {
+										console.error("Ошибка сохранения:", e);
+									} finally {
+										handleFinishActivity();
+									}
+
+								}} color="purple-300" />
 							)}
 
 							{(game.view === 'topic_menu') && (
