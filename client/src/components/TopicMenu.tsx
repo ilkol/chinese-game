@@ -34,7 +34,7 @@ const getStepTitle = (step: API.LevelStep) => {
 	}
 }
 
-interface Props { 
+interface Props {
 	level: API.Level;
 	onBack: () => void;
 	onStartStep: (_: API.LevelStep) => void;
@@ -46,7 +46,7 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
 	const [isLoading, setLoading] = useState(true);
 	useEffect(() => {
 		API.getLevel(level.id).then(data => {
-			if(data.steps !== null) {
+			if (data.steps !== null) {
 				setSteps(data.steps)
 			}
 			setLoading(false)
@@ -71,10 +71,15 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
 			</AnimatePresence>
 			{!isLoading && (
 
-				<div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
+				<div
+					className="min-h-screen bg-slate-50 p-6 flex flex-col items-center bg-center bg-cover bg-no-repeat" 
+					style={{
+						backgroundImage: `url("/assets/levels/1/bg.jpeg")`,
+					}}
+				>
 					{/* Шапка */}
-					<div className="w-full max-w-md flex items-center justify-between mb-8">
-						<button onClick={onBack} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+					<div className="w-full max-w-md flex items-center justify-between mb-8 bg-white rounded-full">
+						<button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
 							<ArrowLeft size={28} />
 						</button>
 						<h1 className="text-xl font-black uppercase tracking-tight">{level.title}</h1>
