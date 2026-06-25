@@ -26,7 +26,7 @@ const getStepTitle = (step: API.LevelStep) => {
 
 	switch (step.type) {
 		case "theory":
-			return "Теория"
+			return "Космознайка"
 		case "final":
 			return `Итоговый тест`
 		default:
@@ -104,7 +104,7 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
 							return (
 								<motion.button
 									key={step.id}
-									whileHover={isUnlocked ? { x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" } : {}}
+									whileHover={isUnlocked ? { x: 5, backgroundColor: "rgba(255, 255, 255, 0.93)" } : {}}
 									whileTap={isUnlocked ? { scale: 0.98 } : {}}
 									disabled={!isUnlocked}
 									onClick={() => onStartStep(step)}
