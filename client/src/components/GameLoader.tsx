@@ -31,7 +31,7 @@ const GameLoader = ({ lightMod = false, isLoading = true }: Props) => {
 	return (
 		<AnimatePresence>
 			{isVisible && (
-				<div className={`h-screen bg-[#${lightMod ? "ffffff" : "020617"}] flex flex-col items-center justify-center`}>
+				<div className={`h-screen ${lightMod ? "bg-white" : "bg-[#020617]"} flex flex-col items-center justify-center`}>
 					<div className="relative">
 						{/* Внешнее кольцо */}
 						<motion.div

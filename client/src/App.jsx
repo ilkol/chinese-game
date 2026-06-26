@@ -200,6 +200,7 @@ function App() {
 							}}
 							onStartStep={handleStartStep}
 							isTeacher={user.role === 'teacher'}
+							backgroundSrc={game.selectedLevel?.background_src}
 						/>
 					</motion.div>
 				)}
@@ -218,6 +219,7 @@ function App() {
 					<DialogPage
 						key="dialog"
 						onComplete={game.completeStep}
+						backgroundSrc={game.selectedLevel?.background_src}
 					/>
 				)}
 
@@ -227,12 +229,14 @@ function App() {
 						title={game.selectedLevel?.title}
 						slides={game.selectedLevelStep?.content}
 						onFinish={game.completeStep}
+						backgroundSrc={game.selectedLevel?.background_src}
 					/>
 				)}
 
 				{game.view === 'quiz' && (
 					<LessonPage
 						key="quiz"
+						backgroundSrc={game.selectedLevel?.background_src}
 						stepDialog={game.selectedLevelStep?.dialog}
 						questionData={game.currentQuestions[quiz.currentIndex]}
 						{...quiz}

@@ -46,19 +46,20 @@ interface ToneListeningQuizTask extends BaseQuiz {
 
 type QuestionData = TestQuiz | ListeningQuiz | FillInBlanksQuiz | MatchingQuiz | CategorizationQuizTask & BaseQuiz | ToneListeningQuizTask;
 
-const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog }: {
+const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog, backgroundSrc }: {
 	questionData: QuestionData;
 	onAnswer: () => void;
 	wrongAnswers: string[];
 	isFinished: boolean;
 	stepDialog?: DialogStep[];
+	backgroundSrc?: string;
 }) => {
 	const props = { ...questionData, onAnswer, wrongAnswers, isFinished };
 
 	return (
 		<div
 			className="min-h-screen flex items-center justify-center p-4 bg-center bg-cover bg-no-repeat"
-			style={{ backgroundImage: `url("/assets/levels/1/bg.jpeg")` }}
+			style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
 		>
 			<WithIntro introDialog={stepDialog}>
 				{props.type === 'test' && <QuizCard {...props} />}

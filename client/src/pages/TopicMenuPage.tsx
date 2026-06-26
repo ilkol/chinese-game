@@ -39,9 +39,10 @@ interface Props {
 	onBack: () => void;
 	onStartStep: (_: API.LevelStep) => void;
 	isTeacher: boolean;
+	backgroundSrc?: string;
 }
 
-const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
+const TopicMenu = ({ level, onBack, onStartStep, isTeacher, backgroundSrc }: Props) => {
 	const [steps, setSteps] = useState<API.LevelStep[]>([]);
 	const [isLoading, setLoading] = useState(true);
 	useEffect(() => {
@@ -73,9 +74,7 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher }: Props) => {
 
 				<div
 					className="min-h-screen bg-slate-50 p-6 flex flex-col items-center bg-center bg-cover bg-no-repeat" 
-					style={{
-						backgroundImage: `url("/assets/levels/1/bg.jpeg")`,
-					}}
+					style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
 				>
 					{/* Шапка */}
 					<div className="w-full max-w-md flex items-center justify-between mb-8 bg-white rounded-full">
