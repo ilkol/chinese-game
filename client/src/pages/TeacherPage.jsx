@@ -12,7 +12,6 @@ const TeacherView = ({ levels, onStartActivity, onOpenMap, user }) => {
 		if (activeTab === 'students') {
 			API.getStudentsProgress().then((data) => {
 				setStudents(data)
-				console.log(data)
 			}).catch(console.error);
 		}
 	}, [activeTab]);
@@ -199,10 +198,9 @@ const ClassPanel = ({ students }) => {
 	useEffect(() => {
 		API.getInviteCode().then(code => {
 			setInviteCode(code);
-			setLoading(false)
-		}).catch(() => {
-		});
-	})
+			setLoading(false);
+		}).catch(() => setLoading(false));
+	}, []);
 
 	return (
 		<div className="space-y-4 md:space-y-6">
@@ -273,13 +271,6 @@ const StudentsTable = ({ students }) => {
 		if (percentage >= 100) return 'bg-emerald-500';
 		if (percentage >= 50) return 'bg-amber-500';
 		return 'bg-rose-500';
-	};
-
-	const getProgressBg = (current, total) => {
-		const percentage = (current / total) * 100;
-		if (percentage >= 100) return 'bg-emerald-50';
-		if (percentage >= 50) return 'bg-amber-50';
-		return 'bg-rose-50';
 	};
 
 	return (
