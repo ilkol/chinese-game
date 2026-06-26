@@ -10,37 +10,28 @@ export const useGameSession = (user, setUser) => {
 	const [currentQuestions, setCurrentQuestions] = useState([]);
 	const [showVictory, setShowVictory] = useState(false);
 
-	const updateLocalProgress = useCallback((planetId, stepId) => {
-		// const currentPlanetProgress = user?.progress?.[planetId] || { theory: false, final: false, quizzes: [] };
-		// let updatedPlanetProgress;
+	const updateLocalProgress = useCallback((levelId, stepId) => {
+		// TODO: обновить когда будет готова структура прогресса
+	}, []);
 
-		// console.log(user?.progress)
-		// if (stepId.startsWith('quiz-')) {
-		// 	const index = parseInt(stepId.split('-')[1]);
-		// 	const newQuizzes = [...(currentPlanetProgress.quizzes || [])];
-		// 	newQuizzes[index] = true;
-		// 	updatedPlanetProgress = { ...currentPlanetProgress, quizzes: newQuizzes };
-		// } else {
-		// 	updatedPlanetProgress = { ...currentPlanetProgress, [stepId]: true };
-		// }
-
-		// const updatedUser = { ...user, progress: { ...user?.progress, [planetId]: updatedPlanetProgress } };
-		// setUser(updatedUser);
-		// localStorage.setItem('user', JSON.stringify(updatedUser));
-	}, [user, setUser]);
-
-	const completeStep = async (stepId) => {
+	const completeStep = useCallback(async () => {
 		try {
-			await API.saveUserProgress(stepId);
-			console.log(stepId)
-			updateLocalProgress(selectedLevel.id, stepId);
-			setView('topic_menu');
-			if (stepId === 'final') setTimeout(() => setShowVictory(true), 500);
+			await API.saveUserProgress(activeStepId);
+			updateLocalProgress(selectedLevel?.id, activeStepId);
+
+			if (selectedLevelStep?.type === 'final') {
+				setView('topic_menu');
+				setTimeout(() => setShowVictory(true), 500);
+			} else {
+				setView('topic_menu');
+			}
 		} catch (e) {
-			console.error("Save error:", e);
+			console.error('Ошибка сохранения прогресса:', e);
 			setView('topic_menu');
+		} finally {
+			setSelectedLevelStep(null);
 		}
-	};
+	}, [activeStepId, selectedLevel, selectedLevelStep]);
 
 	return {
 		view, setView,
@@ -51,6 +42,6 @@ export const useGameSession = (user, setUser) => {
 		currentQuestions, setCurrentQuestions,
 		showVictory, setShowVictory,
 		completeStep,
-		updateLocalProgress
+		updateLocalProgress,
 	};
 };
