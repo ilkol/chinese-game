@@ -293,6 +293,7 @@ function App() {
 
 						{game.view === 'quiz' && (
 							<QuizView
+								stepDialog={game.selectedLevelStep?.dialog}
 								questionData={game.currentQuestions[quiz.currentIndex]}
 								{...quiz}
 							/>
