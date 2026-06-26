@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'http://localhost:5000/api'; // chinese-game-backend.onrender.com
+const API_URL = import.meta.env.API_URL ?? 'http://localhost:5000/api'; // chinese-game-backend.onrender.com
 
 const API = axios.create({
 	baseURL: API_URL,
@@ -43,10 +43,7 @@ export const registerUser = (credentials: UserRegisterData) => API.post('/auth/r
 	return prepareLoginResponse(res.data)
 });
 export const saveUserProgress = (stepId: number) =>
-	API.post('/progress', { step_id: stepId }).then(res => {
-		res.data
-		return true;
-	});
+	API.post('/progress', { step_id: stepId }).then(() => true);
 
 export const getStudentsProgress = () => API.get('/teacher/students').then(res => res.data);
 export const getInviteCode = () => API.get(`/teacher/invite-code`).then(res => res.data as string);
@@ -86,12 +83,23 @@ export interface Level {
 	created_at: string;
 	order_index: number;
 	steps: null | LevelStep[];
+	background_src: string;
 }
 
 export enum LevelStepType {
 	Theory = "theory",
 	Quiz = "quiz",
-	FinalTest = "final"
+	FinalTest = "final",
+	Dialog = "dialog",
+	ToneListening = "tone_listening",
+	Categorization = "categorization",
+}
+
+export interface DialogStepItem {
+	speaker?: string;
+	text: string;
+	emotion?: string;
+	bg?: string;
 }
 
 export interface LevelStep {
@@ -103,6 +111,7 @@ export interface LevelStep {
 	type: LevelStepType;
 	content: StepContent[];
 	description: string;
+	dialog: DialogStepItem[];
 }
 
 export enum TheoryContentType {
