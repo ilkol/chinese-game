@@ -1,16 +1,27 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const MatchingCard = ({ pairs, onComplete }) => {
-	const [selectedFirst, setSelectedFirst] = useState(null);
-	const [selectedSecond, setSelectedSecond] = useState(null);
-	const [matchedIds, setMatchedIds] = useState([]);
+export interface MatchingPair {
+	id: string;
+	first: string;
+	second: string;
+}
+
+enum SelectionType {
+	First = 'first',
+	Second = 'second',
+}
+
+const MatchingCard = ({ pairs, onComplete }: { pairs: MatchingPair[]; onComplete: () => void }) => {
+	const [selectedFirst, setSelectedFirst] = useState<MatchingPair | null>(null);
+	const [selectedSecond, setSelectedSecond] = useState<MatchingPair | null>(null);
+	const [matchedIds, setMatchedIds] = useState<string[]>([]);
 
 	// Стабильное перемешивание один раз при создании
 	const [shuffledFist] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
 	const [shuffledSecond] = useState(() => [...pairs].sort(() => Math.random() - 0.5));
 
-	const checkMatch = (first, second) => {
+	const checkMatch = (first: MatchingPair, second: MatchingPair) => {
 		if (first.id === second.id) {
 			const newMatched = [...matchedIds, first.id];
 			setMatchedIds(newMatched);
@@ -32,10 +43,10 @@ const MatchingCard = ({ pairs, onComplete }) => {
 		setSelectedSecond(null);
 	};
 
-	const handleSelect = (type, item) => {
+	const handleSelect = (type: SelectionType, item: MatchingPair) => {
 		if (matchedIds.includes(item.id)) return;
 
-		if (type === 'first') {
+		if (type === SelectionType.First) {
 			if (selectedSecond) {
 				setSelectedFirst(item);
 				checkMatch(item, selectedSecond);
@@ -66,7 +77,7 @@ const MatchingCard = ({ pairs, onComplete }) => {
 							text={item.first}
 							isSelected={selectedFirst?.id === item.id}
 							isMatched={matchedIds.includes(item.id)}
-							onClick={() => handleSelect('first', item)}
+							onClick={() => handleSelect(SelectionType.First, item)}
 						/>
 					))}
 				</div>
@@ -78,7 +89,7 @@ const MatchingCard = ({ pairs, onComplete }) => {
 							text={item.second}
 							isSelected={selectedSecond?.id === item.id}
 							isMatched={matchedIds.includes(item.id)}
-							onClick={() => handleSelect('second', item)}
+							onClick={() => handleSelect(SelectionType.Second, item)}
 						/>
 					))}
 				</div>
@@ -87,7 +98,7 @@ const MatchingCard = ({ pairs, onComplete }) => {
 	);
 };
 
-const MatchButton = ({ text, isSelected, isMatched, onClick }) => (
+const MatchButton = ({ text, isSelected, isMatched, onClick }: { text: string; isSelected: boolean; isMatched: boolean; onClick: () => void }) => (
 	<motion.button
 		whileTap={{ scale: 0.96 }}
 		onClick={onClick}

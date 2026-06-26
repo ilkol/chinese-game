@@ -3,7 +3,15 @@ import { Volume2 } from 'lucide-react';
 
 window.speechSynthesis.getVoices();
 
-const ListeningCard = ({ taskText, audioText, options, onAnswer, wrongAnswers, isFinished, correctAnswer }) => {
+const ListeningCard = ({ taskText, audioText, options, onAnswer, wrongAnswers, isFinished, correctAnswer }: {
+	taskText?: string;
+	audioText: string;
+	options: string[];
+	onAnswer: (_: string) => void;
+	wrongAnswers: string[];
+	isFinished: boolean;
+	correctAnswer: string;
+}) => {
   
 	const playAudio = () => {
 		// Останавливаем текущую речь, если она уже идет

@@ -1,8 +1,8 @@
 import QuizCard from '../components/QuizCard';
 import ListeningCard from '../components/ListeningCard';
 import FillInBlanksCard from '../components/FillInBlanksCard';
-import MatchingCard from '../components/MatchingCard';
-import CategorizationQuiz from '../components/CategorizationQuiz'
+import MatchingCard, { type MatchingPair } from '../components/MatchingCard';
+import CategorizationQuiz, { type CategorizationQuizTask } from '../components/CategorizationQuiz'
 import ToneListeningQuiz from '../components/ToneListeningQuiz';
 
 const dialog = [
@@ -31,30 +31,67 @@ const QUESTIONS = [
 	{ correct: 'ó', wrong: 'ò', audioStart: 33, audioDuration: 2 },
 ];
 
-const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished }) => {
+interface TestQuiz {
+	type: 'test';
+	taskText: string;
+	question: string;
+	options: string[];
+	correctAnswer: string;
+}
+interface ListeningQuiz {
+	type: 'listening';
+	taskText: string;
+	audioText: string;
+	options: string[];
+	correctAnswer: string;
+}
+interface FillInBlanksQuiz {
+	type: 'blank';
+	taskText: string;
+	sentence: string;
+	options: string[];
+	correctAnswer: string;
+}
+interface MatchingQuiz {
+	type: 'matching';
+	pairs: MatchingPair[];
+	correctAnswer: string;
+}
+interface ToneListeningQuizTask {
+	type: 'tone_listening';
+	questions: { correct: string; wrong: string; audioStart: number; audioDuration: number }[];
+	audioSrc: string;
+	characterSrc: string;
+	backgroundSrc: string;
+	introDialog: { speaker: string; text: string; emotion: string; bg: string }[];
+}
+
+type QuestionData = MatchingQuiz | TestQuiz | ListeningQuiz | FillInBlanksQuiz | CategorizationQuizTask | ToneListeningQuizTask;
+
+const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished }: { questionData: QuestionData; onAnswer: () => void; wrongAnswers: string[]; isFinished: boolean }) => {
 	const props = { ...questionData, onAnswer, wrongAnswers, isFinished };
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 bg-center bg-cover bg-no-repeat" style={{
 			backgroundImage: `url("/assets/levels/1/bg.jpeg")`,
 		}}>
-			{questionData.type === 'test' && <QuizCard {...props} />}
-			{questionData.type === 'listening' && <ListeningCard {...props} />}
-			{questionData.type === 'blank' && <FillInBlanksCard {...props} />}
-			{questionData.type === 'matching' && (
+			{props.type === 'test' && <QuizCard {...props} />}
+			{props.type === 'listening' && <ListeningCard {...props} />}
+			{props.type === 'blank' && <FillInBlanksCard {...props} />}
+			{props.type === 'matching' && (
 				<MatchingCard
-					pairs={questionData.pairs}
-					onComplete={() => onAnswer(questionData.correctAnswer)}
+					pairs={props.pairs}
+					onComplete={() => onAnswer()}
 				/>
 			)}
-			{questionData.type === 'categorization' && (
+			{props.type === 'categorization' && (
 				<CategorizationQuiz
 					introDialog={dialog}
-					quizData={questionData}
-					onComplete={() => onAnswer(questionData.correctAnswer)}
+					quizData={props}
+					onComplete={() => onAnswer()}
 				/>
 			)}
-			{questionData.type === 'tone_listening' && (
+			{props.type === 'tone_listening' && (
 				<ToneListeningQuiz
 					questions={QUESTIONS}
 					audioSrc="/audio/levels/1/tones.mp3"

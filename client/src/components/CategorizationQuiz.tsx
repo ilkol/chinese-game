@@ -20,7 +20,7 @@ export interface QuizItem {
 	correctColumnId: string;
 }
 
-interface Column {
+export interface Column {
 	id: string;
 	title: string;
 }
@@ -37,12 +37,14 @@ export interface DialogStep {
 	bg?: string;    
 }
 
+export interface CategorizationQuizTask {
+	type: 'categorization';
+	columns: Column[];
+	items: QuizItem[];
+}
+
 interface CategorizationQuizProps {
-	quizData: {
-		type: string;
-		columns: Column[];
-		items: QuizItem[];
-	};
+	quizData: CategorizationQuizTask;
 	introDialog?: DialogStep[];
 	onComplete?: () => void;
 }

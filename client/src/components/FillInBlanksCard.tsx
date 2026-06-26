@@ -1,6 +1,14 @@
 import { motion } from 'framer-motion';
 
-const FillInBlanksCard = ({ taskText, sentence, options, onAnswer, wrongAnswers, isFinished, correctAnswer }) => {
+const FillInBlanksCard = ({ taskText, sentence, options, onAnswer, wrongAnswers, isFinished, correctAnswer }: {
+	taskText?: string;
+	sentence: string;
+	options: string[];
+	onAnswer: (_: string) => void;
+	wrongAnswers: string[];
+	isFinished: boolean;
+	correctAnswer: string;
+}) => {
   const parts = sentence.split('[___]');
 
   return (
