@@ -28,6 +28,17 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 		animate(y, -planet.y + (window.innerHeight / 2), { type: 'spring', stiffness: 35, damping: 15 });
 		animate(scale, customScale, { type: 'spring', stiffness: 35, damping: 15 });
 	};
+	// const focusOnPlanet = (planetId, customScale = 1.0) => {
+	// 	const planet = planets.find(p => p.id === planetId);
+	// 	if (!planet) return;
+
+	// 	const centerX = window.innerWidth / 2;
+	// 	const centerY = window.innerHeight / 2;
+
+	// 	animate(x, centerX - (500 + planet.x), { type: 'spring', stiffness: 35, damping: 15 });
+	// 	animate(y, centerY - planet.y, { type: 'spring', stiffness: 35, damping: 15 });
+	// 	animate(scale, customScale, { type: 'spring', stiffness: 35, damping: 15 });
+	// };
 
 	useEffect(() => {
 		if (activePlanetId) {
