@@ -3,20 +3,21 @@ import { useGameSession } from "./hooks/useGameSession";
 import useQuiz from "./hooks/useQuiz";
 import * as API from './services/api';
 
-import MapView from "./views/MapView";
-import TopicMenu from "./components/TopicMenu";
-import TheoryReader from "./components/TheoryReader";
-import QuizView from "./views/QuizView";
+
+import TopicMenu from "./pages/TopicMenuPage";
+import MapView from "./pages/MapPage";
+import TheoryReader from "./features/theory/TheoryReader";
+import QuizView from "./pages/LessonPage";
 import VictoryModal from "./components/VictoryModal";
-import AuthView from "./views/AuthView";
-import TeacherView from "./views/TeacherView";
+import AuthView from "./pages/AuthPage";
+import TeacherView from "./pages/TeacherPage";
 import IntroView from "./views/IntroView";
 import { LayoutDashboard } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import GameLoader from "./components/GameLoader";
 import spaceBg from './assets/space.webp';
-import OnboardingView from "./views/Onboarding";
-import DialogView from "./views/DialogView";
+import OnboardingView from "./pages/OnboardingPage";
+import DialogView from "./pages/DialogPage";
 import PuzzleMap from "./views/CollectionView";
 
 function App() {

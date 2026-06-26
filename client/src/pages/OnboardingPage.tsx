@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import pandaImg from '../assets/xiaosing.png'; // Твоя панда
 import { ChevronRight } from 'lucide-react';
 
 import coinImg from '../assets/cosmoney.png';
 import pandaWaving from '../assets/waving.png';
-import pandaThinking from '../assets/thinking.png';
-import pandaSad from '../assets/sad.png';
 import pandaProud from '../assets/proud.png';
 import pandaExcited from '../assets/excited.png';
 import pandaHappy from '../assets/happy.png';
@@ -28,7 +25,7 @@ import suit6 from '../assets/spacesuit/6.png';
 
 const suits = [suit1, suit2, suit3, suit4, suit5, suit6];
 
-const getSuitStyles = (index) => {
+const getSuitStyles = (index: number) => {
 	const themes = [
 		{ color: 'text-blue-300', glow: 'bg-blue-400/20', border: 'border-blue-400/30' },
 		{ color: 'text-purple-300', glow: 'bg-purple-400/20', border: 'border-purple-400/30' },
@@ -93,7 +90,7 @@ const SuitGallery = () => {
 
 const rockets = [rocket1, rocket2, rocket3, rocket4, rocket5, rocket6];
 
-const getRocketStyles = (index) => {
+const getRocketStyles = (index: number) => {
 	const levels = [
 		{ color: 'text-blue-400', glow: 'bg-blue-500/20', border: 'border-blue-500/30', flare: 'opacity-20' },    // Ур 1
 		{ color: 'text-cyan-400', glow: 'bg-cyan-500/30', border: 'border-cyan-500/40', flare: 'opacity-30' },    // Ур 2
@@ -215,7 +212,7 @@ const steps = [
 ];
 
 const GoldRain = () => {
-	const [coins, setCoins] = useState([]);
+	const [coins, setCoins] = useState<{ id: number; x: number; delay: number; duration: number; size: number; blur: number }[]>([]);
 
 	useEffect(() => {
 		const frame = requestAnimationFrame(() => {
@@ -267,7 +264,7 @@ const GoldRain = () => {
 	);
 };
 
-const DelayedVideo = ({ src }) => {
+const DelayedVideo = ({ src }: { src: string }) => {
 
 
 	return (
@@ -287,7 +284,7 @@ const DelayedVideo = ({ src }) => {
 	);
 };
 
-const OnboardingView = ({ onComplete }) => {
+const OnboardingView = ({ onComplete }: { onComplete: () => void }) => {
 	const [currentStep, setCurrentStep] = useState(0);
 
 

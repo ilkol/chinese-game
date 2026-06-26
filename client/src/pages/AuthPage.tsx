@@ -4,13 +4,14 @@ import { Rocket, Lock, User, ArrowRight, Shield } from 'lucide-react';
 import spaceBg from '../assets/space.webp';
 import { getErrorMessage, loginUser, registerUser } from '../services/api';
 
-const AuthView = ({ onLogin }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AuthView = ({ onLogin }: { onLogin: (data: any, isRegistering: boolean) => void }) => {
 	const [isLogin, setIsLogin] = useState(true);
 	const [isTeacher, setIsTeacher] = useState(false);
 	const [formData, setFormData] = useState({ username: '', password: '', invite_code: '' });
 	const [error, setError] = useState('');
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setError('');
 
@@ -21,7 +22,8 @@ const AuthView = ({ onLogin }) => {
 			localStorage.setItem('token', data.token);
 			onLogin(data, !isLogin);
 
-		} catch (err) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (err: any) {
 			setError(getErrorMessage(err.response?.data?.error) || err.message || 'Ошибка системы');
 		}
 	};

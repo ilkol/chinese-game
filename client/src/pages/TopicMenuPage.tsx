@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, CheckCircle2, Lock, ArrowLeft, PlayCircle, Trophy, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import * as API from '../services/api';
-import GameLoader from './GameLoader';
+import GameLoader from '../components/GameLoader';
 
 
 const getStepIcon = (step: API.LevelStep) => {

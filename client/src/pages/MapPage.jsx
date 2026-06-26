@@ -1,5 +1,5 @@
-import LevelModal from "../components/LevelModal";
-import SpaceMap from "../components/SpaceMap";
+import LevelModal from "../features/map/LevelModal";
+import SpaceMap from "../features/map/SpaceMap";
 
 function MapView({ levels, activePlanetId, onSelectLevel, selectedLevel, isModalOpened, onCloseModal, onStartTopic, isLanding}) {
 	

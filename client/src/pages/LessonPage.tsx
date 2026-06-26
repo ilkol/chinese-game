@@ -1,11 +1,11 @@
-import WithIntro from '../components/WithIntro';
-import { type DialogStep } from '../components/TaskIntroDialog';
-import QuizCard from '../components/QuizCard';
-import ListeningCard from '../components/ListeningCard';
-import FillInBlanksCard from '../components/FillInBlanksCard';
-import MatchingCard, { type MatchingPair } from '../components/MatchingCard';
-import CategorizationQuiz, { type CategorizationQuizTask } from '../components/CategorizationQuiz';
-import ToneListeningQuiz from '../components/ToneListeningQuiz';
+import { type DialogStep } from '../features/dialog/TaskIntroDialog';
+import QuizCard from '../features/quiz/QuizCard';
+import ListeningCard from '../features/quiz/ListeningCard';
+import FillInBlanksCard from '../features/quiz/FillInBlanksCard';
+import MatchingCard, { type MatchingPair } from '../features/quiz/MatchingCard';
+import CategorizationQuiz, { type CategorizationQuizTask } from '../features/quiz/CategorizationQuiz';
+import ToneListeningQuiz from '../features/quiz/ToneListeningQuiz';
+import WithIntro from '../features/dialog/WithIntro';
 
 // Добавляем introDialog в каждый тип
 interface BaseQuiz {

@@ -1,9 +1,9 @@
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion'; // Добавили useTransform
 import { useRef, useEffect, useState } from 'react';
 import { Target, LogOut, QrCode, X, ArrowRight } from 'lucide-react';
-import spaceBg from '../assets/space.webp';
+import spaceBg from '../../assets/space.webp';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import * as api from '../services/api';
+import * as api from '../../services/api';
 
 const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 	const containerRef = useRef(null);
