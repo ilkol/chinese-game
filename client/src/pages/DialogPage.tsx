@@ -1,9 +1,8 @@
-import DialogEngine from '../features/dialog/DialogEngine';
-import { DIALOG_STEPS } from './dialog-steps';
+import DialogEngine, { type DialogStep } from '../features/dialog/DialogEngine';
 
-const DialogPage = ({ onComplete, backgroundSrc }: { onComplete: () => void, backgroundSrc?: string; }) => (
+const DialogPage = ({ onComplete, backgroundSrc, dialog }: { onComplete: () => void, backgroundSrc?: string; dialog: DialogStep[]; }) => (
 	<DialogEngine
-		steps={DIALOG_STEPS}
+		steps={dialog}
 		backgroundSrc={backgroundSrc}
 		onComplete={onComplete}
 	/>

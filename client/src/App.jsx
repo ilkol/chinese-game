@@ -220,6 +220,7 @@ function App() {
 						key="dialog"
 						onComplete={game.completeStep}
 						backgroundSrc={game.selectedLevel?.background_src}
+						dialog={game.selectedLevelStep?.content}
 					/>
 				)}
 
