@@ -48,6 +48,13 @@ const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished }) => {
 				/>
 			)}
 			{questionData.type === 'categorization' && (
+				<CategorizationQuiz
+					introDialog={dialog}
+					quizData={questionData}
+					onComplete={() => onAnswer(questionData.correctAnswer)}
+				/>
+			)}
+			{questionData.type === 'tone_listening' && (
 				<ToneListeningQuiz
 					questions={QUESTIONS}
 					audioSrc="/audio/levels/1/tones.mp3"
