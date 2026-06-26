@@ -3,6 +3,7 @@ import ListeningCard from '../components/ListeningCard';
 import FillInBlanksCard from '../components/FillInBlanksCard';
 import MatchingCard from '../components/MatchingCard';
 import CategorizationQuiz from '../components/CategorizationQuiz'
+import ToneListeningQuiz from '../components/ToneListeningQuiz';
 
 const dialog = [
 	{
@@ -17,6 +18,17 @@ const dialog = [
 		emotion: '/assets/chars/lun-lun/shy.png',
 		bg: 'purple',
 	},
+];
+
+const QUESTIONS = [
+	{ correct: 'ā', wrong: 'à', audioStart: 1, audioDuration: 2 },
+	{ correct: 'ō', wrong: 'ǒ', audioStart: 7, audioDuration: 2 },
+	{ correct: 'ì', wrong: 'í', audioStart: 13, audioDuration: 2 },
+	{ correct: 'ù', wrong: 'ǔ', audioStart: 17, audioDuration: 2 },
+	{ correct: 'è', wrong: 'ē', audioStart: 21, audioDuration: 2 },
+	{ correct: 'ǘ', wrong: 'ǜ', audioStart: 26, audioDuration: 2 },
+	{ correct: 'ī', wrong: 'ǐ', audioStart: 30, audioDuration: 2 },
+	{ correct: 'ó', wrong: 'ò', audioStart: 33, audioDuration: 2 },
 ];
 
 const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished }) => {
@@ -36,10 +48,26 @@ const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished }) => {
 				/>
 			)}
 			{questionData.type === 'categorization' && (
-				<CategorizationQuiz
-					introDialog={dialog}
-					quizData={questionData}
-					onComplete={() => onAnswer(questionData.correctAnswer)}
+				<ToneListeningQuiz
+					questions={QUESTIONS}
+					audioSrc="/audio/levels/1/tones.mp3"
+					characterSrc="/assets/chars/lun-lun/happy.png"
+					backgroundSrc="/assets/bg/space.jpg"
+					introDialog={[
+						{
+							speaker: 'Лун-Лун',
+							text: 'Привет! Сейчас я буду произносить слоги с разными тонами.',
+							emotion: '/assets/chars/lun-lun/happy.png',
+							bg: 'violet',
+						},
+						{
+							speaker: 'Лун-Лун',
+							text: 'Послушай и выбери *правильное написание тона*. Удачи! 🎉',
+							emotion: '/assets/chars/lun-lun/excited.png',
+							bg: 'violet',
+						},
+					]}
+					onComplete={(score, total) => console.log(score, total)}
 				/>
 			)}
 		</div>
