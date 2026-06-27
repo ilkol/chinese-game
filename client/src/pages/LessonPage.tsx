@@ -69,7 +69,7 @@ const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog
 
 	return (
 		<div
-			className="min-h-screen flex items-center justify-center p-4 bg-center bg-cover bg-no-repeat"
+			className="min-h-screen flex items-center justify-center bg-center bg-cover bg-no-repeat"
 			style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
 		>
 			<WithIntro introDialog={stepDialog}>
