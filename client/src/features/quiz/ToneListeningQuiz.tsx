@@ -124,6 +124,7 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 
 		const audio = new Audio(src);
 		const start = q.audioStart ?? current * segmentDuration;
+		
 		const duration = q.audioDuration ?? segmentDuration;
 
 		audio.currentTime = start;

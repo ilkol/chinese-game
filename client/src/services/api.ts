@@ -93,6 +93,7 @@ export enum LevelStepType {
 	Dialog = "dialog",
 	ToneListening = "tone_listening",
 	Categorization = "categorization",
+	PlanetClick = "planet_click",
 }
 
 export interface DialogStepItem {
@@ -157,3 +158,8 @@ export interface TestContentListening {
 export type TestStepContent = TestContentTest | TestContentListening;
 
 export type StepContent = TheoryStepContent | TestStepContent;
+
+export interface PlanetQuestion {
+	correct: string;
+	audioSrc: string;
+}

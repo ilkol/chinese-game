@@ -6,6 +6,9 @@ import MatchingCard, { type MatchingPair } from '../features/quiz/MatchingCard';
 import CategorizationQuiz, { type CategorizationQuizTask } from '../features/quiz/CategorizationQuiz';
 import ToneListeningQuiz from '../features/quiz/ToneListeningQuiz';
 import WithIntro from '../features/dialog/WithIntro';
+import PlanetClickQuiz from '../features/quiz/PlanetClickQuiz';
+
+const ALL_LETTERS = ['q', 'w', 'r', 't', 'y', 'p', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'b', 'n', 'm', 'zh', 'ch', 'sh'];
 
 // Добавляем introDialog в каждый тип
 interface BaseQuiz {
@@ -44,7 +47,15 @@ interface ToneListeningQuizTask extends BaseQuiz {
 	backgroundSrc: string;
 }
 
-type QuestionData = TestQuiz | ListeningQuiz | FillInBlanksQuiz | MatchingQuiz | CategorizationQuizTask & BaseQuiz | ToneListeningQuizTask;
+interface PlanetClickTask extends BaseQuiz {
+	type: 'planet_click';
+	questions: { correct: string; audioSrc: string }[];
+}
+
+type QuestionData =
+	TestQuiz | ListeningQuiz | FillInBlanksQuiz |
+	MatchingQuiz | CategorizationQuizTask & BaseQuiz | ToneListeningQuizTask | PlanetClickTask
+	;
 
 const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog, backgroundSrc }: {
 	questionData: QuestionData;
@@ -73,6 +84,14 @@ const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog
 						audioSrc={props.audioSrc}
 						characterSrc={props.characterSrc}
 						backgroundSrc={props.backgroundSrc}
+						onComplete={(score, total) => { console.log(score, total); onAnswer(); }}
+					/>
+				)}
+				{props.type === 'planet_click' && (
+					<PlanetClickQuiz
+						questions={props.questions}
+						allLetters={ALL_LETTERS}
+						characterSrc="/assets/chars/lun-lun/happy.png"
 						onComplete={(score, total) => { console.log(score, total); onAnswer(); }}
 					/>
 				)}
