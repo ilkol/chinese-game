@@ -1,48 +1,28 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2 } from 'lucide-react';
+import { Volume2, RotateCcw } from 'lucide-react';
 
-export interface MatchingPair {
+export interface MatchingPlanetPair {
 	id: string;
-	letter: string;
-	audioSrc: string;
+	label: string;
+	audioSrc?: string;
+	imageSrc?: string;
 }
 
 interface PlanetMatchingQuizProps {
-	pairs: MatchingPair[];
+	pairs: MatchingPlanetPair[];
+	pairsPerRound?: number;
 	characterSrc?: string;
 	backgroundSrc?: string;
 	onComplete?: () => void;
 }
 
-const CORRECT_PHRASES = [
-	'正确！Идеально! ✨', '棒！Супер! 🚀',
-	'太好了！Отлично! 🌟', '对了！Так держать! 💪',
-];
-const WRONG_PHRASES = [
-	'Не та планета! 🛸', 'Слушай внимательнее 🌙',
-	'Попробуй ещё раз! ✨', 'Почти! 🚀',
-];
-
 const PLANET_COUNT = 14;
-const PAIRS_PER_ROUND = 4;
+const CORRECT_PHRASES = ['正确！Идеально! ✨', '棒！Супер! 🚀', '太好了！Отлично! 🌟', '对了！Так держать! 💪'];
+const WRONG_PHRASES = ['Не та буква! 🛸', 'Слушай внимательнее 🌙', 'Попробуй ещё раз ✨', 'Почти! 🚀'];
 
 const random = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const jitter = (max = 16) => (Math.random() - 0.5) * max * 2;
-
-const assignPlanetImages = (count: number): number[] =>
-	Array.from({ length: PLANET_COUNT }, (_, i) => i + 1)
-		.sort(() => Math.random() - 0.5)
-		.slice(0, count);
-
-// Разбиваем все пары на раунды по PAIRS_PER_ROUND
-const chunkPairs = (pairs: MatchingPair[]): MatchingPair[][] => {
-	const chunks: MatchingPair[][] = [];
-	for (let i = 0; i < pairs.length; i += PAIRS_PER_ROUND) {
-		chunks.push(pairs.slice(i, i + PAIRS_PER_ROUND));
-	}
-	return chunks;
-};
 
 const STARS = Array.from({ length: 60 }).map((_, i) => {
 	const size = Math.random() * 2.5 + 0.5;
@@ -62,167 +42,142 @@ const STARS = Array.from({ length: 60 }).map((_, i) => {
 
 const Stars = () => (
 	<div className="absolute inset-0 overflow-hidden pointer-events-none">
-		{STARS.map(star => <div key={star.id} style={star.style} />)}
+		{STARS.map(s => <div key={s.id} style={s.style} />)}
 	</div>
 );
 
-// Планета со звуком (верхний ряд)
-interface SoundPlanetProps {
-	pair: MatchingPair;
-	imageIndex: number;
-	offset: { x: number; y: number; size: number };
-	isSelected: boolean;
-	isMatched: boolean;
-	isWrong: boolean;
-	onClick: () => void;
-}
-
-const SoundPlanet: React.FC<SoundPlanetProps> = ({
-	imageIndex, offset, isSelected, isMatched, isWrong, onClick,
-}) => {
-	const glow =
-		isMatched  ? 'drop-shadow-[0_0_24px_rgba(52,211,153,0.9)]' :
-		isSelected ? 'drop-shadow-[0_0_24px_rgba(96,165,250,0.9)]' :
-		isWrong    ? 'drop-shadow-[0_0_24px_rgba(248,113,113,0.9)]' :
-		'hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.3)]';
-
-	return (
-		<motion.button
-			onClick={onClick}
-			disabled={isMatched}
-			animate={{
-				scale: isMatched ? [1, 1.2, 0.8, 0] : isWrong ? [1, 0.9, 1] : 1,
-				x: isWrong ? [-8, 8, -6, 6, 0] : 0,
-				opacity: isMatched ? [1, 1, 0] : 1,
-			}}
-			transition={{ duration: isMatched ? 0.5 : 0.3 }}
-			style={{
-				position: 'absolute',
-				left: offset.x,
-				top: offset.y,
-				width: offset.size,
-				height: offset.size,
-			}}
-		>
-			<div className={`relative w-full h-full transition-all ${glow}`}>
-				<img
-					src={`/assets/planets/${imageIndex}.png`}
-					alt="planet"
-					className="w-full h-full object-contain"
-				/>
-				{/* Иконка звука по центру */}
-				<div className="absolute inset-0 flex items-center justify-center">
-					<div className={`rounded-full p-2 ${isSelected ? 'bg-blue-500/60' : 'bg-black/40'} backdrop-blur-sm transition-all`}>
-						<Volume2 size={20} className="text-white" />
-					</div>
-				</div>
-			</div>
-		</motion.button>
-	);
+// Назначаем уникальные картинки планет для раунда
+const assignImages = (count: number): number[] => {
+	const all = Array.from({ length: PLANET_COUNT }, (_, i) => i + 1);
+	return all.sort(() => Math.random() - 0.5).slice(0, count * 2); // x2 — для верхнего и нижнего рядов
 };
 
-// Планета с буквой (нижний ряд)
-interface LetterPlanetProps {
-	pair: MatchingPair;
-	imageIndex: number;
-	offset: { x: number; y: number; size: number };
-	isSelected: boolean;
-	isMatched: boolean;
-	isWrong: boolean;
-	onClick: () => void;
-}
-
-const LetterPlanet: React.FC<LetterPlanetProps> = ({
-	pair, imageIndex, offset, isSelected, isMatched, isWrong, onClick,
-}) => {
-	const glow =
-		isMatched  ? 'drop-shadow-[0_0_24px_rgba(52,211,153,0.9)]' :
-		isSelected ? 'drop-shadow-[0_0_24px_rgba(167,139,250,0.9)]' :
-		isWrong    ? 'drop-shadow-[0_0_24px_rgba(248,113,113,0.9)]' :
-		'hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.3)]';
-
-	return (
-		<motion.button
-			onClick={onClick}
-			disabled={isMatched}
-			animate={{
-				scale: isMatched ? [1, 1.2, 0.8, 0] : isWrong ? [1, 0.9, 1] : 1,
-				x: isWrong ? [-8, 8, -6, 6, 0] : 0,
-				opacity: isMatched ? [1, 1, 0] : 1,
-			}}
-			transition={{ duration: isMatched ? 0.5 : 0.3 }}
-			style={{
-				position: 'absolute',
-				left: offset.x,
-				top: offset.y,
-				width: offset.size,
-				height: offset.size,
-			}}
-		>
-			<div className={`relative w-full h-full transition-all ${glow}`}>
-				<img
-					src={`/assets/planets/${imageIndex}.png`}
-					alt={pair.letter}
-					className="w-full h-full object-contain"
-				/>
-				<div className="absolute inset-0 flex items-center justify-center">
-					<span className="text-white font-black text-xl sm:text-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-						{pair.letter}
-					</span>
-				</div>
-			</div>
-		</motion.button>
-	);
-};
-
-// Генерация позиций для ряда планет в контейнере 320x140
-const generateRowPositions = (count: number) => {
-	const anchors = [
-		{ x: 0,   y: 10 },
-		{ x: 80,  y: 0  },
-		{ x: 160, y: 15 },
-		{ x: 240, y: 5  },
-	];
-	return anchors.slice(0, count).map(a => ({
-		x: a.x + jitter(10),
-		y: a.y + jitter(10),
-		size: 80 + Math.floor(Math.random() * 30), // 80–110px
+// Позиции для планет в ряду — с джиттером
+const generateRowPositions = (count: number, containerWidth = 320) => {
+	const slotWidth = containerWidth / count;
+	// Чередуем высокие и низкие позиции
+	const yAnchors = [20, 70, 10, 80, 40, 60]; // px — чередование вверх/вниз
+	
+	return Array.from({ length: count }).map((_, i) => ({
+		x: slotWidth * i + slotWidth / 2 - 40 + jitter(10),
+		y: yAnchors[i % yAnchors.length] + jitter(10), // якорь + небольшой джиттер
+		size: 75 + Math.floor(Math.random() * 25),
 	}));
+};
+
+type PlanetState = 'idle' | 'selected' | 'matched' | 'wrong';
+
+interface PlanetProps {
+	id: string;
+	label?: string;
+	imageSrc?: string;
+	imageIndex: number;
+	position: { x: number; y: number; size: number };
+	state: PlanetState;
+	isSound?: boolean;
+	isPlaying?: boolean;
+	onClick: () => void;
+}
+
+const Planet: React.FC<PlanetProps> = ({ label, imageIndex, position, state, isSound, isPlaying, imageSrc, onClick }) => {
+	const glow =
+		state === 'selected' ? 'drop-shadow-[0_0_20px_rgba(96,165,250,0.9)]' :
+			state === 'matched' ? 'drop-shadow-[0_0_20px_rgba(52,211,153,0.9)]' :
+				state === 'wrong' ? 'drop-shadow-[0_0_20px_rgba(248,113,113,0.9)]' :
+					'drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]';
+
+	return (
+		<motion.button
+			onClick={onClick}
+			disabled={state === 'matched'}
+			initial={{ opacity: 0, scale: 0.5 }}
+			animate={{
+				opacity: state === 'matched' ? 0 : 1,
+				scale: state === 'matched' ? 0.3 : state === 'selected' ? 1.1 : 1,
+				x: state === 'wrong' ? [-8, 8, -6, 6, 0] : 0,
+			}}
+			transition={{
+				opacity: { duration: 0.4 },
+				scale: { duration: 0.25 },
+				x: { duration: 0.35 },
+			}}
+			style={{
+				position: 'absolute',
+				left: position.x,
+				top: position.y,
+				width: position.size,
+			}}
+			className="flex flex-col items-center gap-1"
+		>
+			<div className={`relative transition-all ${glow}`}
+				style={{ width: position.size, height: position.size }}
+			>
+				<img
+					src={`/assets/planets/${imageIndex}.png`}
+					alt={label ?? 'planet'}
+					className="w-full h-full object-contain"
+				/>
+				<div className="absolute inset-0 flex items-center justify-center">
+					{imageSrc ? (
+						// Картинка черты поверх планеты
+						<img
+							src={imageSrc}
+							alt={label}
+							className="w-3/5 h-3/5 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+						/>
+					) : isSound ? (
+						<Volume2
+							size={28}
+							className={`text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] ${isPlaying ? 'animate-pulse text-blue-300' : ''}`}
+						/>
+					) : (
+						<span className="text-white font-black text-md drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+							{label}
+						</span>
+					)}
+				</div>
+			</div>
+		</motion.button>
+	);
 };
 
 const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 	pairs,
+	pairsPerRound = 4,
 	characterSrc,
 	backgroundSrc,
 	onComplete,
 }) => {
-	const rounds = chunkPairs(pairs);
+	// Разбиваем пары на раунды
+	const rounds = Array.from(
+		{ length: Math.ceil(pairs.length / pairsPerRound) },
+		(_, i) => pairs.slice(i * pairsPerRound, i * pairsPerRound + pairsPerRound)
+	);
+
 	const [roundIndex, setRoundIndex] = useState(0);
-	const [matchedIds, setMatchedIds] = useState<string[]>([]);
-	const [selectedSound, setSelectedSound] = useState<MatchingPair | null>(null);
-	const [selectedLetter, setSelectedLetter] = useState<MatchingPair | null>(null);
-	const [wrongIds, setWrongIds] = useState<string[]>([]);
+	const [finished, setFinished] = useState(false);
 	const [charMsg, setCharMsg] = useState<string | null>(null);
+	const [playingId, setPlayingId] = useState<string | null>(null);
+
+	const currentRound = rounds[roundIndex];
+
+	// Стейт выделения и совпадений
+	const [selectedTop, setSelectedTop] = useState<string | null>(null);
+	const [selectedBottom, setSelectedBottom] = useState<string | null>(null);
+	const [matchedIds, setMatchedIds] = useState<string[]>([]);
+	const [wrongIds, setWrongIds] = useState<string[]>([]);
+
+	// Перемешанные порядки для текущего раунда
+	const [topOrder] = useState(() => [...currentRound].sort(() => Math.random() - 0.5));
+	const [bottomOrder, setBottomOrder] = useState(() => [...currentRound].sort(() => Math.random() - 0.5));
+
+	// Картинки и позиции — генерируем один раз для раунда
+	const [images] = useState(() => assignImages(pairsPerRound));
+	const [topPositions] = useState(() => generateRowPositions(pairsPerRound));
+	const [bottomPositions] = useState(() => generateRowPositions(pairsPerRound));
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const charTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	const currentRound = rounds[roundIndex] ?? [];
-	const totalMatched = matchedIds.length;
-	const totalPairs = pairs.length;
-
-	// Стабильные позиции и картинки для текущего раунда
-	const [roundAssets] = useState(() =>
-		rounds.map(round => ({
-			soundImages: assignPlanetImages(round.length),
-			letterImages: assignPlanetImages(round.length),
-			soundPositions: generateRowPositions(round.length),
-			letterPositions: generateRowPositions(round.length),
-			shuffledLetters: [...round].sort(() => Math.random() - 0.5),
-		}))
-	);
-
-	const assets = roundAssets[roundIndex];
 
 	const showBubble = useCallback((msg: string) => {
 		if (charTimerRef.current) clearTimeout(charTimerRef.current);
@@ -230,96 +185,91 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 		charTimerRef.current = setTimeout(() => setCharMsg(null), 3000);
 	}, []);
 
-	const playAudio = useCallback((audioSrc: string) => {
+	const playAudio = useCallback((id: string, src?: string) => {
+		if (!src) return;
 		if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-		const audio = new Audio(audioSrc);
+		const audio = new Audio(src);
 		audioRef.current = audio;
-		audio.play().catch(() => {});
+		setPlayingId(id);
+		audio.addEventListener('ended', () => setPlayingId(null));
+		audio.addEventListener('error', () => setPlayingId(null));
+		audio.play().catch(() => setPlayingId(null));
 	}, []);
 
-	const handleLetterClick = (pair: MatchingPair) => {
-		if (matchedIds.includes(pair.id)) return;
-
-		// Если звуковая планета не выбрана — просто выделяем букву
-		if (!selectedSound) {
-			setSelectedLetter(prev => prev?.id === pair.id ? null : pair);
-			return;
+	const advanceRound = useCallback(() => {
+		if (roundIndex + 1 >= rounds.length) {
+			setFinished(true);
+			onComplete?.();
+		} else {
+			const next = roundIndex + 1;
+			setRoundIndex(next);
+			setMatchedIds([]);
+			setSelectedTop(null);
+			setSelectedBottom(null);
+			setWrongIds([]);
+			setBottomOrder([...rounds[next]].sort(() => Math.random() - 0.5));
 		}
+	}, [roundIndex, rounds, onComplete]);
 
-		// Проверяем совпадение
-		if (selectedSound.id === pair.id) {
-			// Совпало
-			const newMatched = [...matchedIds, pair.id];
+	const handleTopClick = (id: string, src?: string) => {
+		if (matchedIds.includes(id)) return;
+		playAudio(id, src);
+		setSelectedTop(id);
+
+		if (selectedBottom) {
+			checkMatch(id, selectedBottom);
+		}
+	};
+
+	const handleBottomClick = (id: string) => {
+		if (matchedIds.includes(id)) return;
+
+		if (selectedTop) {
+			checkMatch(selectedTop, id);
+		} else {
+			setSelectedBottom(id);
+		}
+	};
+
+	const checkMatch = (topId: string, bottomId: string) => {
+		if (topId === bottomId) {
+			const newMatched = [...matchedIds, topId];
 			setMatchedIds(newMatched);
-			setSelectedSound(null);
-			setSelectedLetter(null);
+			setSelectedTop(null);
+			setSelectedBottom(null);
 			showBubble(random(CORRECT_PHRASES));
 
-			// Проверяем конец раунда
-			const roundMatchedCount = newMatched.filter(id =>
-				currentRound.some(p => p.id === id)
-			).length;
-
-			if (roundMatchedCount === currentRound.length) {
-				setTimeout(() => {
-					if (roundIndex + 1 < rounds.length) {
-						setRoundIndex(r => r + 1);
-					} else {
-						onComplete?.();
-					}
-				}, 800);
+			if (newMatched.length === currentRound.length) {
+				setTimeout(advanceRound, 800);
 			}
 		} else {
-			// Не совпало
-			setWrongIds([selectedSound.id, pair.id]);
+			setWrongIds([topId, bottomId]);
 			showBubble(random(WRONG_PHRASES));
 			setTimeout(() => {
 				setWrongIds([]);
-				setSelectedSound(null);
-				setSelectedLetter(null);
+				setSelectedTop(null);
+				setSelectedBottom(null);
 			}, 700);
 		}
 	};
 
-	// Также можно выбрать букву первой, потом звук
-	const handleSoundClickWithLetter = (pair: MatchingPair) => {
-		if (matchedIds.includes(pair.id)) return;
-		playAudio(pair.audioSrc);
-
-		if (selectedLetter) {
-			if (selectedLetter.id === pair.id) {
-				const newMatched = [...matchedIds, pair.id];
-				setMatchedIds(newMatched);
-				setSelectedSound(null);
-				setSelectedLetter(null);
-				showBubble(random(CORRECT_PHRASES));
-
-				const roundMatchedCount = newMatched.filter(id =>
-					currentRound.some(p => p.id === id)
-				).length;
-
-				if (roundMatchedCount === currentRound.length) {
-					setTimeout(() => {
-						if (roundIndex + 1 < rounds.length) {
-							setRoundIndex(r => r + 1);
-						} else {
-							onComplete?.();
-						}
-					}, 800);
-				}
-			} else {
-				setWrongIds([pair.id, selectedLetter.id]);
-				showBubble(random(WRONG_PHRASES));
-				setTimeout(() => {
-					setWrongIds([]);
-					setSelectedSound(null);
-					setSelectedLetter(null);
-				}, 700);
-			}
-		} else {
-			setSelectedSound(prev => prev?.id === pair.id ? null : pair);
-		}
+	const getTopState = (id: string): PlanetState => {
+		if (matchedIds.includes(id)) return 'matched';
+		if (wrongIds.includes(id)) return 'wrong';
+		if (selectedTop === id) return 'selected';
+		return 'idle';
 	};
+
+	const getBottomState = (id: string): PlanetState => {
+		if (matchedIds.includes(id)) return 'matched';
+		if (wrongIds.includes(id)) return 'wrong';
+		if (selectedBottom === id) return 'selected';
+		return 'idle';
+	};
+
+	const totalPairs = pairs.length;
+	const completedPairs = roundIndex * pairsPerRound + matchedIds.length;
+	const progress = (completedPairs / totalPairs) * 100;
 
 	return (
 		<div
@@ -329,70 +279,93 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 			{!backgroundSrc && <Stars />}
 			{backgroundSrc && <div className="absolute inset-0 bg-black/40" />}
 
-			<div className="relative z-10 w-full max-w-sm sm:max-w-lg px-4 py-8 flex flex-col items-center gap-10">
+			<div className="relative z-10 w-full max-w-sm px-4 py-8 flex flex-col items-center gap-10">
 
 				{/* Прогресс */}
-				<div className="w-full">
-					<div className="flex justify-between text-white/40 text-xs mb-2 font-medium">
-						<span>Пар найдено: {totalMatched} из {totalPairs}</span>
-						<span>Раунд {roundIndex + 1} из {rounds.length}</span>
-					</div>
-					<div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-						<motion.div
-							className="h-full bg-gradient-to-r from-violet-400 to-blue-400 rounded-full"
-							animate={{ width: `${(totalMatched / totalPairs) * 100}%` }}
-							transition={{ duration: 0.4 }}
-						/>
-					</div>
-				</div>
-
-				{/* Подсказка */}
-				<p className="text-white/40 text-xs text-center -mt-6">
-					Нажми на планету со звуком, затем найди букву
-				</p>
-
-				{/* Верхний ряд — звуковые планеты */}
-				<div className="relative w-[320px] h-[130px]">
-					<AnimatePresence>
-						{currentRound.map((pair, i) => (
-							<SoundPlanet
-								key={`sound-${roundIndex}-${pair.id}`}
-								pair={pair}
-								imageIndex={assets.soundImages[i]}
-								offset={assets.soundPositions[i]}
-								isSelected={selectedSound?.id === pair.id}
-								isMatched={matchedIds.includes(pair.id)}
-								isWrong={wrongIds.includes(pair.id)}
-								onClick={() => handleSoundClickWithLetter(pair)}
+				{!finished && (
+					<div className="w-full">
+						<div className="flex justify-between text-white/40 text-xs mb-2 font-medium">
+							<span>Пар найдено: {completedPairs} из {totalPairs}</span>
+							<span>Раунд {roundIndex + 1} из {rounds.length}</span>
+						</div>
+						<div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+							<motion.div
+								className="h-full bg-gradient-to-r from-violet-400 to-blue-400 rounded-full"
+								animate={{ width: `${progress}%` }}
+								transition={{ duration: 0.4 }}
 							/>
-						))}
-					</AnimatePresence>
-				</div>
+						</div>
+					</div>
+				)}
 
-				{/* Разделитель */}
-				<div className="w-full flex items-center gap-4">
-					<div className="flex-1 h-px bg-white/10" />
-					<span className="text-white/20 text-xs uppercase tracking-widest">найди пару</span>
-					<div className="flex-1 h-px bg-white/10" />
-				</div>
+				{finished ? (
+					<motion.div
+						initial={{ opacity: 0, scale: 0.9 }}
+						animate={{ opacity: 1, scale: 1 }}
+						className="flex flex-col items-center gap-4 text-white text-center"
+					>
+						<div className="text-7xl font-black bg-gradient-to-br from-violet-300 to-blue-300 bg-clip-text text-transparent">
+							{totalPairs}/{totalPairs}
+						</div>
+						<h2 className="text-2xl font-bold">Все пары найдены! 🌟</h2>
+						<button
+							onClick={() => {
+								setRoundIndex(0);
+								setFinished(false);
+								setMatchedIds([]);
+								setSelectedTop(null);
+								setSelectedBottom(null);
+							}}
+							className="mt-4 flex items-center gap-2 px-6 py-3 rounded-full border-2 border-violet-400/60 text-violet-200 font-semibold hover:bg-violet-500/20 transition-all"
+						>
+							<RotateCcw size={16} /> Повторить
+						</button>
+					</motion.div>
+				) : (
+					<>
+						<p className="text-white/40 text-xs text-center -mb-6">
+							{topOrder[0]?.imageSrc
+								? 'Найди название для каждой черты'
+								: 'Нажми на планету со звуком, затем найди букву'
+							}
+						</p>
 
-				{/* Нижний ряд — буквенные планеты */}
-				<div className="relative w-[320px] h-[130px]">
-					<AnimatePresence>
-						{assets.shuffledLetters.map((pair, i) => (
-							<LetterPlanet
-								key={`letter-${roundIndex}-${pair.id}`}
-								pair={pair}
-								imageIndex={assets.letterImages[i]}
-								offset={assets.letterPositions[i]}
-								isSelected={selectedLetter?.id === pair.id}
-								isMatched={matchedIds.includes(pair.id)}
-								isWrong={wrongIds.includes(pair.id)}
-								onClick={() => handleLetterClick(pair)}
-							/>
-						))}
-					</AnimatePresence>
-				</div>
+						{/* Верхний ряд — звуковые планеты */}
+						<div className="relative w-full h-52">
+							{topOrder.map((pair, i) => (
+								<Planet
+									key={pair.id}
+									id={pair.id}
+									imageIndex={images[i]}
+									position={topPositions[i]}
+									state={getTopState(pair.id)}
+									imageSrc={pair.imageSrc}        // ← добавить
+									isSound={!pair.imageSrc}        // ← звук только если нет картинки
+									isPlaying={playingId === pair.id}
+									onClick={() => handleTopClick(pair.id, pair.audioSrc)}
+								/>
+							))}
+						</div>
+
+						{/* Разделитель */}
+						<div className="w-full h-[1px] bg-white/10" />
+
+						{/* Нижний ряд — буквенные планеты */}
+						<div className="relative w-full h-52">
+							{bottomOrder.map((pair, i) => (
+								<Planet
+									key={pair.id}
+									id={pair.id}
+									label={pair.label}
+									imageIndex={images[pairsPerRound + i]}
+									position={bottomPositions[i]}
+									state={getBottomState(pair.id)}
+									onClick={() => handleBottomClick(pair.id)}
+								/>
+							))}
+						</div>
+					</>
+				)}
 			</div>
 
 			{/* Пузырь персонажа */}
@@ -405,7 +378,7 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 						transition={{ type: 'spring', stiffness: 260, damping: 25 }}
 						className="fixed bottom-8 left-1/2 z-50 flex items-center gap-4 w-[92%] max-w-md bg-white/10 backdrop-blur-md p-4 rounded-3xl shadow-2xl border-2 border-white/20 pointer-events-none"
 					>
-						<div className="w-14 h-14 flex items-center justify-center shrink-0 overflow-hidden bg-white/10 rounded-2xl p-1">
+						<div className="w-16 h-16 flex items-center justify-center shrink-0 overflow-hidden bg-white/10 rounded-2xl p-1">
 							{characterSrc
 								? <img src={characterSrc} alt="Персонаж" className="w-full h-full object-contain" />
 								: <span className="text-3xl">🚀</span>

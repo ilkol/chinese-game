@@ -55,7 +55,7 @@ interface PlanetClickTask extends BaseQuiz {
 
 interface PlanetMatchingTask extends BaseQuiz {
 	type: 'planet_matching';
-	pairs: { id: string; letter: string; audioSrc: string }[];
+	pairs: { id: string; label: string; audioSrc?: string }[];
 }
 
 type QuestionData =

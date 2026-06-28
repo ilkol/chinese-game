@@ -165,8 +165,8 @@ export interface PlanetQuestion {
 	audioSrc: string;
 }
 
-export interface PlanetMatchingPair {
+export interface MatchingPlanetPair {
 	id: string;
-	letter: string;
-	audioSrc: string;
+	label: string;
+	audioSrc?: string;
 }
