@@ -5,7 +5,7 @@ import { LayoutDashboard } from "lucide-react";
 import { useGameSession } from "./hooks/useGameSession";
 import useQuiz from "./hooks/useQuiz";
 import * as API from './services/api';
-import spaceBg from './assets/space.webp';
+import spaceBg from '/assets/space.webp';
 
 import AuthPage from "./pages/AuthPage";
 import MapPage from "./pages/MapPage";

@@ -1,9 +1,9 @@
 import type { DialogStep } from '../features/dialog/DialogEngine';
 
-import pandaWaving from '../assets/waving.png';
-import pandaProud from '../assets/proud.png';
-import pandaExcited from '../assets/excited.png';
-import pandaHappy from '../assets/happy.png';
+import pandaWaving from '/assets/chars/sao-sin/waving.png';
+import pandaProud from '/assets/chars/sao-sin/proud.png';
+import pandaExcited from '/assets/chars/sao-sin/excited.png';
+import pandaHappy from '/assets/chars/sao-sin/happy.png';
 
 export interface OnboardingStep extends DialogStep {
 	bgClass?: string;

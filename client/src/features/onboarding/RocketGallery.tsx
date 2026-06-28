@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 
-import rocket1 from '../../assets/rocket/1.png';
-import rocket2 from '../../assets/rocket/2.png';
-import rocket3 from '../../assets/rocket/3.png';
-import rocket4 from '../../assets/rocket/4.png';
-import rocket5 from '../../assets/rocket/5.png';
-import rocket6 from '../../assets/rocket/6.png';
+import rocket1 from '/assets/rockets/1.png';
+import rocket2 from '/assets/rockets/2.png';
+import rocket3 from '/assets/rockets/3.png';
+import rocket4 from '/assets/rockets/4.png';
+import rocket5 from '/assets/rockets/5.png';
+import rocket6 from '/assets/rockets/6.png';
 
 
 const rockets = [rocket1, rocket2, rocket3, rocket4, rocket5, rocket6];

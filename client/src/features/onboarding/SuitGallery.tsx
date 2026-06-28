@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 
 
-import suit1 from '../../assets/spacesuit/1.png';
-import suit2 from '../../assets/spacesuit/2.png';
-import suit3 from '../../assets/spacesuit/3.png';
-import suit4 from '../../assets/spacesuit/4.png';
-import suit5 from '../../assets/spacesuit/5.png';
-import suit6 from '../../assets/spacesuit/6.png';
+import suit1 from '/assets/skins/1.png';
+import suit2 from '/assets/skins/2.png';
+import suit3 from '/assets/skins/3.png';
+import suit4 from '/assets/skins/4.png';
+import suit5 from '/assets/skins/5.png';
+import suit6 from '/assets/skins/6.png';
 
 
 const suits = [suit1, suit2, suit3, suit4, suit5, suit6];

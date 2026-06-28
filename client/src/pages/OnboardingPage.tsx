@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import coinImg from '../assets/cosmoney.png';
+import coinImg from '/assets/cosmoney.png';
 import DialogEngine from '../features/dialog/DialogEngine';
 import GoldRain from '../features/onboarding/GoldRain';
 import RocketGallery from '../features/onboarding/RocketGallery';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import coinImg from '../../assets/cosmoney.png';
+import coinImg from '/assets/cosmoney.png';
 
 const GoldRain = () => {
 	const [coins, setCoins] = useState<{

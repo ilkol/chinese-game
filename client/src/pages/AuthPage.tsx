@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Lock, User, ArrowRight, Shield } from 'lucide-react';
-import spaceBg from '../assets/space.webp';
+import spaceBg from '/assets/space.webp';
 import { getErrorMessage, loginUser, registerUser } from '../services/api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
