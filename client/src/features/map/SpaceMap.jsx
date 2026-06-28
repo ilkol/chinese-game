@@ -160,7 +160,7 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding, completedL
 								{/* Контейнер планеты (теперь замок находится прямо внутри него) */}
 								<div
 									className="relative w-40 h-40 rounded-full shadow-xl flex items-center justify-center text-5xl overflow-hidden"
-									style={{ backgroundImage: `url(/assets/planets/${planet.color}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+									style={{ backgroundImage: `url(/assets/planets/${planet.planet_img_src}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}
 								>
 									{/* Блокировка применяется строго к кругу планеты */}
 									{!isUnlocked && (

@@ -98,6 +98,7 @@ export interface Level {
 	order_index: number;
 	steps: null | LevelStep[];
 	background_src: string;
+	planet_img_src: string;
 }
 
 export enum LevelStepType {

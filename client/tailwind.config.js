@@ -9,6 +9,7 @@ export default {
 		'from-orange-400', 'to-red-500',
 		'from-green-400', 'to-emerald-600',
 		'from-blue-400', 'to-cyan-500',
+		'from-purple-400', 'to-purple-400',
 		'bg-green-600',
 		"text-green-300",
 		// Добавь сюда все остальные цвета, которые используешь в данных

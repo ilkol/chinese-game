@@ -23,8 +23,8 @@ const LevelModal = ({ isOpen, level, onClose, onStart }) => {
             className="relative w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-[40px] shadow-2xl overflow-hidden"
           >
             {/* Декоративный градиент сверху */}
-            <div className={`h-32 bg-gradient-to-br ${level.color} flex items-center justify-center text-7xl`}>
-              {level.icon}
+            <div className={`h-32 bg-gradient-to-br from-${level.color}-400 to-${level.color}-400 flex items-center justify-center text-7xl`}>
+              <img src={`/assets/planets/${level.planet_img_src}.png`} alt={level.title} className="w-24 h-24" />
             </div>
 
             <button 
@@ -57,7 +57,7 @@ const LevelModal = ({ isOpen, level, onClose, onStart }) => {
               {/* Кнопка старта */}
               <button
                 onClick={() => onStart(level)}
-                className={`w-full py-5 rounded-2xl bg-gradient-to-r ${level.color} text-white font-black text-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3`}
+                className={`w-full py-5 rounded-2xl bg-gradient-to-r from-${level.color}-400 to-${level.color}-400 text-white font-black text-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3`}
               >
                 <Play fill="currentColor" />
                 ПОЕХАЛИ!
