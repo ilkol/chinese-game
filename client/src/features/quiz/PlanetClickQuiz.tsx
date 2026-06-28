@@ -225,6 +225,7 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 				setPlanetStates({});
 				setAnswered(false);
 				setCharMsg(null);
+				setPositions(generatePlanetPositions(PLANETS_PER_QUESTION));
 			}
 		}, 1500);
 	};
@@ -245,6 +246,9 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 		}));
 	};
 
+	const [positions, setPositions] = useState(() => generatePlanetPositions(PLANETS_PER_QUESTION));
+
+
 	const handleRestart = () => {
 		setCurrent(0);
 		setScore(0);
@@ -258,7 +262,6 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 		setQuestionData({ choices, images, offsets });
 	};
 
-	const [positions] = useState(() => generatePlanetPositions(PLANETS_PER_QUESTION));
 
 	return (
 		<div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden select-none bg-[#0a0a1a]">
