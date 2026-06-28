@@ -55,7 +55,6 @@ const assignImages = (count: number): number[] => {
 // Позиции для планет в ряду — с джиттером
 const generateRowPositions = (count: number, containerWidth = 320) => {
 	const slotWidth = containerWidth / count;
-	// Чередуем высокие и низкие позиции
 	const yAnchors = [20, 70, 10, 80, 40, 60]; // px — чередование вверх/вниз
 	
 	return Array.from({ length: count }).map((_, i) => ({
@@ -173,8 +172,8 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 
 	// Картинки и позиции — генерируем один раз для раунда
 	const [images] = useState(() => assignImages(pairsPerRound));
-	const [topPositions] = useState(() => generateRowPositions(pairsPerRound));
-	const [bottomPositions] = useState(() => generateRowPositions(pairsPerRound));
+	const [topPositions, setTopPositions] = useState(() => generateRowPositions(pairsPerRound));
+	const [bottomPositions, setBottomPositions] = useState(() => generateRowPositions(pairsPerRound));
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const charTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -209,8 +208,10 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 			setWrongIds([]);
 			setTopOrder([...rounds[next]].sort(() => Math.random() - 0.5));
 			setBottomOrder([...rounds[next]].sort(() => Math.random() - 0.5));
+			setTopPositions(generateRowPositions(pairsPerRound));
+			setBottomPositions(generateRowPositions(pairsPerRound));
 		}
-	}, [roundIndex, rounds, onComplete]);
+	}, [roundIndex, rounds, onComplete, pairsPerRound]); 
 
 	const handleTopClick = (id: string, src?: string) => {
 		if (matchedIds.includes(id)) return;
