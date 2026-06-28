@@ -1,11 +1,16 @@
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion'; // Добавили useTransform
 import { useRef, useEffect, useState } from 'react';
-import { Target, LogOut, QrCode, X, ArrowRight } from 'lucide-react';
+import { Target, LogOut, QrCode, X, ArrowRight, Lock } from 'lucide-react';
 import spaceBg from '/assets/space.webp';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import * as api from '../../services/api';
+/*
+inteface Props {
+	completedLevelIds: number[];
+}
+*/
 
-const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
+const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding, completedLevelIds }) => {
 	const containerRef = useRef(null);
 
 	const scale = useMotionValue(0.7);
@@ -144,20 +149,32 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 						)}
 					</svg>
 
-					{planets.map((planet) => (
-						<motion.div key={planet.id} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-							onClick={() => onSelectLevel(planet)}
-							className="absolute flex flex-col items-center"
-							style={{ left: 500 + planet.x - 64, top: planet.y }}
-						>
-							<div className={`w-32 h-32 rounded-full shadow-2xl flex items-center justify-center text-5xl bg-gradient-to-br ${planet.color} border-4 border-white/20 backdrop-blur-sm`}>
-								{planet.icon}
-							</div>
-							<div className="mt-4 bg-black/60 backdrop-blur-md border border-white/10 px-6 py-2 rounded-2xl text-white font-bold whitespace-nowrap shadow-xl">
-								{planet.title}
-							</div>
-						</motion.div>
-					))}
+					{planets.map((planet, index) => {
+						const isUnlocked = index === 0 || (completedLevelIds && completedLevelIds.includes(planets[index - 1].id));
+						return (
+							<motion.div key={planet.id} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+								onClick={() => isUnlocked ? onSelectLevel(planet) : null}
+								className="absolute flex flex-col items-center"
+								style={{ left: 500 + planet.x - 64, top: planet.y }}
+							>
+								{!isUnlocked && (
+									<div className="absolute inset-0 flex items-center justify-center">
+										<div className="bg-black/60 backdrop-blur-sm rounded-full w-full h-full flex items-center justify-center">
+											<Lock size={32} className="text-white/60" />
+										</div>
+									</div>
+								)}
+								<div
+									className={`w-40 h-40 rounded-full shadow-xl flex items-center justify-center text-5xl`}
+									style={{ backgroundImage: `url(/assets/planets/${planet.color}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+								>
+								</div>
+								<div className="mt-1 bg-black/60 backdrop-blur-md border border-white/10 px-6 py-2 rounded-2xl text-white font-bold whitespace-nowrap shadow-xl">
+									{planet.title}
+								</div>
+							</motion.div>
+						)
+					})}
 				</motion.div>
 			</motion.div>
 

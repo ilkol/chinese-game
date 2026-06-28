@@ -35,7 +35,7 @@ export const getErrorMessage = (key: string): string => {
 }
 
 export const getLevels = (withSteps: boolean = false) => API.get(`/level?with_steps=${withSteps}`).then(res => res.data as Level[]);
-export const getLevel = (id: number) => API.get(`/level/${id}`).then(res => res.data as Level);
+export const getCompletedLevelIDs = () => API.get(`/progress/levels`).then(res => res.data as number[]);
 export const loginUser = (credentials: UserLoginData) => API.post('/auth/login', credentials).then(res => {
 	return prepareLoginResponse(res.data)
 });
