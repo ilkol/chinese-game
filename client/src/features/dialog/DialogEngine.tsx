@@ -9,7 +9,7 @@ export interface DialogStep {
 	speaker?: string;
 	emotion?: string;
 	bg?: string;
-	video?: { src: string; muted?: boolean };
+	video?: { src: string; muted?: boolean; inline?: boolean };
 	photo?: { src: string; alt: string; size?: string };
 }
 
@@ -38,7 +38,9 @@ const DialogEngine = ({ steps, backgroundSrc, onComplete, children, getBgClass }
 			style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
 		>
 			{/* Видео-фон */}
-			{step.video && <DelayedVideo src={step.video.src} muted={step.video.muted} />}
+			{step.video && !step.video.inline && (
+				<DelayedVideo src={step.video.src} muted={step.video.muted} />
+			)}
 
 			{/* Фото */}
 			{step.photo && (
@@ -58,7 +60,28 @@ const DialogEngine = ({ steps, backgroundSrc, onComplete, children, getBgClass }
 					</motion.div>
 				</AnimatePresence>
 			)}
-
+			{step.video?.inline && (
+				<AnimatePresence>
+					<motion.div
+						key={`video-inline-${currentStep}`}
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0 }}
+						className="absolute inset-x-0 z-10 flex items-center justify-center"
+						style={{ top: '10%', bottom: '320px' }} // между верхом и диалоговой плашкой
+					>
+						<video
+							autoPlay
+							muted={step.video.muted}
+							loop
+							playsInline
+							className="max-h-full max-w-[80%] rounded-3xl shadow-2xl object-contain"
+						>
+							<source src={step.video.src} type="video/mp4" />
+						</video>
+					</motion.div>
+				</AnimatePresence>
+			)}
 			{/* Кастомный контент (монеты, галерея и т.д.) */}
 			{children?.(step)}
 
