@@ -91,7 +91,6 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding }) => {
 			setIsScannerOpen(false);
 			setManualCode("");
 		} catch (e) {
-			console.log()
 			setError("Код не найден. Проверьте символы.");
 		}
 

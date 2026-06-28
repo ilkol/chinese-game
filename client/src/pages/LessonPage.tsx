@@ -50,7 +50,7 @@ interface ToneListeningQuizTask extends BaseQuiz {
 
 interface PlanetClickTask extends BaseQuiz {
 	type: 'planet_click';
-	questions: { correct: string; audioSrc: string }[];
+	questions: { label: string; audioSrc: string }[];
 }
 
 interface PlanetMatchingTask extends BaseQuiz {

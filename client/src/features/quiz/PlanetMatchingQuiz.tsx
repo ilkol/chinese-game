@@ -153,7 +153,6 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 		{ length: Math.ceil(pairs.length / pairsPerRound) },
 		(_, i) => pairs.slice(i * pairsPerRound, i * pairsPerRound + pairsPerRound)
 	);
-	console.log('Rounds:', rounds);
 
 	const [roundIndex, setRoundIndex] = useState(0);
 	const [finished, setFinished] = useState(false);
