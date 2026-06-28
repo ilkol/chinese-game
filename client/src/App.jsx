@@ -67,6 +67,47 @@ function App() {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		if (loading || !user) return;
+
+		const stateToPush = {
+			view: game.view,
+			selectedLevel: game.selectedLevel,
+			selectedLevelStep: game.selectedLevelStep,
+			currentQuestions: game.currentQuestions,
+			activePlanetId: game.activePlanetId,
+			navigationSource: navigationSource
+		};
+
+		if (!window.history.state || window.history.state.view !== game.view) {
+			window.history.pushState(stateToPush, '', `#${game.view}`);
+		}
+	}, [game.view, loading, user]);
+
+	useEffect(() => {
+		const handlePopState = (event) => {
+			if (event.state && event.state.view) {
+				const saved = event.state;
+
+				game.setView(saved.view);
+				game.setSelectedLevel(saved.selectedLevel);
+				game.setSelectedLevelStep(saved.selectedLevelStep);
+				game.setCurrentQuestions(saved.currentQuestions || []);
+				game.setActivePlanetId(saved.activePlanetId);
+				setNavigationSource(saved.navigationSource);
+			} else {
+				if (user) {
+					if (user.role === 'admin') game.setView('admin_panel');
+					else if (user.role === 'teacher') game.setView('teacher_panel');
+					else game.setView('map');
+				}
+			}
+		};
+
+		window.addEventListener('popstate', handlePopState);
+		return () => window.removeEventListener('popstate', handlePopState);
+	}, [user]);
+
 	const handleStartStep = (step, levelFromTeacher = null) => {
 		const targetLevel = levelFromTeacher || game.selectedLevel;
 		if (!targetLevel) return;
@@ -105,7 +146,7 @@ function App() {
 		if (user.role === 'teacher') {
 			game.setView(navigationSource === 'map' ? 'topic_menu' : 'teacher_panel');
 		} else {
-			game.setView('topic_menu');
+			window.history.back();
 		}
 	};
 
@@ -211,9 +252,7 @@ function App() {
 						<TopicMenuPage
 							level={game.selectedLevel}
 							onBack={() => {
-								game.setView('map');
-								game.setSelectedLevel(null);
-								game.setActivePlanetId(null);
+								window.history.back();
 							}}
 							onStartStep={handleStartStep}
 							isTeacher={user.role === 'teacher'}
