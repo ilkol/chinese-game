@@ -15,6 +15,7 @@ import DialogPage from "./pages/DialogPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import TeacherPage from "./pages/TeacherPage";
 import IntroPage from "./pages/IntroPage";
+import AdminPage from "./pages/AdminPage";
 
 import TheoryReader from "./features/theory/TheoryReader";
 import GameLoader from "./components/GameLoader";
@@ -31,6 +32,9 @@ function App() {
 	const game = useGameSession(user, setUser);
 
 	const quiz = useQuiz(game.currentQuestions, async () => {
+		if (!user) {
+			return;
+		}
 		if (user.role === 'teacher') {
 			game.setCurrentQuestions([]);
 			game.setView(navigationSource === 'map' ? 'topic_menu' : 'teacher_panel');
@@ -88,7 +92,9 @@ function App() {
 		setUser(data);
 		localStorage.setItem('user', JSON.stringify(data));
 
-		if (data.role === 'teacher') {
+		if (data.role === 'admin') {
+			game.setView('admin_panel');
+		} else if (data.role === 'teacher') {
 			game.setView('teacher_panel');
 		} else {
 			game.setView(isNewUser ? 'intro' : 'map');
@@ -180,6 +186,17 @@ function App() {
 								</button>
 							</div>
 						)}
+						{user.role === 'admin' && (
+							<div className="absolute top-6 left-6 z-50">
+								<button
+									onClick={() => game.setView('admin_panel')}
+									className="flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:bg-red-700 transition-all active:scale-95"
+								>
+									<LayoutDashboard size={20} />
+									Админка
+								</button>
+							</div>
+						)}
 					</motion.div>
 				)}
 
@@ -212,6 +229,15 @@ function App() {
 						levels={levels}
 						onStartActivity={handleStartStep}
 						onOpenMap={() => game.setView('map')}
+					/>
+				)}
+				{game.view === 'admin_panel' && (
+					<AdminPage
+						key="admin_panel"
+						onLogout={() => {
+							localStorage.clear();
+							window.location.reload();
+						}}
 					/>
 				)}
 

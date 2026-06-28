@@ -49,6 +49,19 @@ export const getStudentsProgress = () => API.get('/teacher/students').then(res =
 export const getInviteCode = () => API.get(`/teacher/invite-code`).then(res => res.data as string);
 export const joinStudentToTeacher = (code: string) => API.post(`/user/join`, { invite_code: code} ).then(res => res.data.status as string);
 
+export const createStep = (levelId: number, step: Partial<LevelStep>) =>
+	API.post(`/level/${levelId}/step`, step).then(res => res.data as LevelStep);
+
+export const updateStep = (levelId: number, stepId: number, step: Partial<LevelStep>) =>
+	API.put(`/level/${levelId}/step/${stepId}`, step).then(res => res.data);
+
+export const deleteStep = (levelId: number, stepId: number) =>
+	API.delete(`/level/${levelId}/step/${stepId}`).then(res => res.data);
+
+export const upsertDialog = (stepId: number, steps: DialogStepItem[]) =>
+	API.put(`/step/${stepId}/dialog`, { steps }).then(res => res.data);
+
+
 export default API;
 
 export enum UserRole {
