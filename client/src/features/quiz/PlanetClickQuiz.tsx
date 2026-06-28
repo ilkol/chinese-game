@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, RotateCcw } from 'lucide-react';
 
 export interface PlanetQuestion {
-	correct: string;
+	label: string;
 	audioSrc: string;
 }
 
@@ -168,7 +168,7 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 
 	// Генерируем данные для текущего вопроса — стабильно через useState
 	const [questionData, setQuestionData] = useState(() => {
-		const choices = generateChoices(questions[0].correct, allLetters);
+		const choices = generateChoices(questions[0].label, allLetters);
 		const images = assignPlanetImages(PLANETS_PER_QUESTION);
 		const offsets = choices.map(() => ({ x: jitter(20), y: jitter(20) }));
 		return { choices, images, offsets };
@@ -199,13 +199,13 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 		if (answered) return;
 		setAnswered(true);
 
-		const isCorrect = letter === q.correct;
+		const isCorrect = letter === q.label;
 		if (isCorrect) setScore(s => s + 1);
 
 		// Подсвечиваем все планеты
 		const states: Record<string, 'idle' | 'correct' | 'wrong'> = {};
 		questionData.choices.forEach(ch => {
-			states[ch] = ch === q.correct ? 'correct' : ch === letter ? 'wrong' : 'idle';
+			states[ch] = ch === q.label ? 'correct' : ch === letter ? 'wrong' : 'idle';
 		});
 		setPlanetStates(states);
 		showBubble(random(isCorrect ? CORRECT_PHRASES : WRONG_PHRASES));
@@ -218,7 +218,7 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 			} else {
 				const next = current + 1;
 				setCurrent(next);
-				const choices = generateChoices(questions[next].correct, allLetters);
+				const choices = generateChoices(questions[next].label, allLetters);
 				const images = assignPlanetImages(PLANETS_PER_QUESTION);
 				const offsets = choices.map(() => ({ x: jitter(20), y: jitter(20) }));
 				setQuestionData({ choices, images, offsets });
@@ -252,7 +252,7 @@ const PlanetClickQuiz: React.FC<PlanetClickQuizProps> = ({
 		setAnswered(false);
 		setCharMsg(null);
 		setPlanetStates({});
-		const choices = generateChoices(questions[0].correct, allLetters);
+		const choices = generateChoices(questions[0].label, allLetters);
 		const images = assignPlanetImages(PLANETS_PER_QUESTION);
 		const offsets = choices.map(() => ({ x: jitter(20), y: jitter(20) }));
 		setQuestionData({ choices, images, offsets });
