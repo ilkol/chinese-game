@@ -157,18 +157,20 @@ const SpaceMap = ({ levels, onSelectLevel, activePlanetId, isLanding, completedL
 								className="absolute flex flex-col items-center"
 								style={{ left: 500 + planet.x - 64, top: planet.y }}
 							>
-								{!isUnlocked && (
-									<div className="absolute inset-0 flex items-center justify-center">
-										<div className="bg-black/60 backdrop-blur-sm rounded-full w-full h-full flex items-center justify-center">
-											<Lock size={32} className="text-white/60" />
-										</div>
-									</div>
-								)}
+								{/* Контейнер планеты (теперь замок находится прямо внутри него) */}
 								<div
-									className={`w-40 h-40 rounded-full shadow-xl flex items-center justify-center text-5xl`}
+									className="relative w-40 h-40 rounded-full shadow-xl flex items-center justify-center text-5xl overflow-hidden"
 									style={{ backgroundImage: `url(/assets/planets/${planet.color}.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}
 								>
+									{/* Блокировка применяется строго к кругу планеты */}
+									{!isUnlocked && (
+										<div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-full">
+											<Lock size={32} className="text-white/60" />
+										</div>
+									)}
 								</div>
+
+								{/* Название планеты (вынесено за пределы зоны блокировки) */}
 								<div className="mt-1 bg-black/60 backdrop-blur-md border border-white/10 px-6 py-2 rounded-2xl text-white font-bold whitespace-nowrap shadow-xl">
 									{planet.title}
 								</div>
