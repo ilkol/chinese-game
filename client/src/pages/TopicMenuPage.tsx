@@ -57,9 +57,12 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher, backgroundSrc }: Pro
 	}, [level])
 
 	return (
-		<>
-			<AnimatePresence>
-				{isLoading && (
+		<div 
+			className="relative min-h-screen w-screen overflow-hidden bg-slate-50 bg-center bg-cover bg-no-repeat"
+			style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
+		>
+			<AnimatePresence mode="wait">
+				{isLoading ? (
 					<motion.div
 						key="global-loader"
 						exit={{ opacity: 0, scale: 1.1 }} // Плавное растворение с легким увеличением
@@ -68,14 +71,15 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher, backgroundSrc }: Pro
 					>
 						<GameLoader lightMod isLoading={isLoading} />
 					</motion.div>
-				)}
-			</AnimatePresence>
-			{!isLoading && (
-
-				<div
-					className="min-h-screen bg-slate-50 p-6 flex flex-col items-center bg-center bg-cover bg-no-repeat" 
-					style={{ backgroundImage: backgroundSrc ? `url(${backgroundSrc})` : undefined }}
-				>
+ 				) : (
+					<motion.div
+						key="menu-content"
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 0.5, ease: "easeOut" }}
+						className="min-h-screen p-6 flex flex-col items-center relative z-10"
+					>
+						
 					{/* Шапка */}
 					<div className="w-full max-w-md flex items-center justify-between mb-8 bg-white rounded-full">
 						<button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
@@ -151,9 +155,11 @@ const TopicMenu = ({ level, onBack, onStartStep, isTeacher, backgroundSrc }: Pro
 							);
 						})}
 					</div>
-				</div>
-			)}
-		</>
+
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
 	);
 };
 
