@@ -339,6 +339,7 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 									imageIndex={images[i]}
 									position={topPositions[i]}
 									state={getTopState(pair.id)}
+									label={pair.label}        // ← добавить
 									imageSrc={pair.imageSrc}        // ← добавить
 									isSound={!pair.imageSrc}        // ← звук только если нет картинки
 									isPlaying={playingId === pair.id}
