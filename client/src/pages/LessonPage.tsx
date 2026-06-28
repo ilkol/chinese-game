@@ -7,6 +7,7 @@ import CategorizationQuiz, { type CategorizationQuizTask } from '../features/qui
 import ToneListeningQuiz from '../features/quiz/ToneListeningQuiz';
 import WithIntro from '../features/dialog/WithIntro';
 import PlanetClickQuiz from '../features/quiz/PlanetClickQuiz';
+import PlanetMatchingQuiz from '../features/quiz/PlanetMatchingQuiz';
 
 const ALL_LETTERS = ['q', 'w', 'r', 't', 'y', 'p', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'b', 'n', 'm', 'zh', 'ch', 'sh'];
 
@@ -52,9 +53,15 @@ interface PlanetClickTask extends BaseQuiz {
 	questions: { correct: string; audioSrc: string }[];
 }
 
+interface PlanetMatchingTask extends BaseQuiz {
+	type: 'planet_matching';
+	pairs: { id: string; letter: string; audioSrc: string }[];
+}
+
 type QuestionData =
 	TestQuiz | ListeningQuiz | FillInBlanksQuiz |
-	MatchingQuiz | CategorizationQuizTask & BaseQuiz | ToneListeningQuizTask | PlanetClickTask
+	MatchingQuiz | CategorizationQuizTask & BaseQuiz | ToneListeningQuizTask | PlanetClickTask |
+	PlanetMatchingTask
 	;
 
 const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog, backgroundSrc }: {
@@ -93,6 +100,13 @@ const QuizView = ({ questionData, onAnswer, wrongAnswers, isFinished, stepDialog
 						allLetters={ALL_LETTERS}
 						characterSrc="/assets/chars/lun-lun/happy.png"
 						onComplete={(score, total) => { console.log(score, total); onAnswer(); }}
+					/>
+				)}
+				{props.type === 'planet_matching' && (
+					<PlanetMatchingQuiz
+						pairs={props.pairs}
+						characterSrc="/assets/chars/lun-lun/happy.png"
+						onComplete={onAnswer}
 					/>
 				)}
 			</WithIntro>

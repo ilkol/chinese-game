@@ -94,6 +94,7 @@ export enum LevelStepType {
 	ToneListening = "tone_listening",
 	Categorization = "categorization",
 	PlanetClick = "planet_click",
+	PlanetMatching = "planet_matching",
 }
 
 export interface DialogStepItem {
@@ -161,5 +162,11 @@ export type StepContent = TheoryStepContent | TestStepContent;
 
 export interface PlanetQuestion {
 	correct: string;
+	audioSrc: string;
+}
+
+export interface PlanetMatchingPair {
+	id: string;
+	letter: string;
 	audioSrc: string;
 }
