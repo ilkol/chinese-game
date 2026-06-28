@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 
-const QuizCard = ({ taskText, question, options, onAnswer, wrongAnswers, isFinished, correctAnswer }: {
+const QuizCard = ({ taskText, question, imgSrc, options, onAnswer, wrongAnswers, isFinished, correctAnswer }: {
 	taskText?: string;
 	question: string;
+	imgSrc?: string;
 	options: string[];
 	onAnswer: (_: string) => void;
 	wrongAnswers: string[];
@@ -19,10 +20,16 @@ const QuizCard = ({ taskText, question, options, onAnswer, wrongAnswers, isFinis
 					{taskText || "Как переводится иероглиф?"}
 				</span>
 
-				{/* Адаптивный размер иероглифа: на мобилках 5xl, на планшетах/пк 9xl */}
-				<h2 className="text-6xl sm:text-9xl font-bold text-[#1e293b] leading-tight break-all px-4">
-					{question}
-				</h2>
+				{question && (
+					<div className="text-2xl sm:text-4xl font-bold text-slate-700 mb-4 sm:mb-8 px-4">
+						{question}
+					</div>
+				)}
+				{imgSrc && (
+					<div className="w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center shrink-0 overflow-hidden bg-slate-50 rounded-2xl p-1 shadow-inner">
+						<img src={imgSrc} className="object-contain z-10" />
+					</div>
+				)}
 			</motion.div>
 
 			{/* Сетка ответов: 1 колонка на телефонах, 2 колонки от 640px (sm) */}
@@ -41,7 +48,6 @@ const QuizCard = ({ taskText, question, options, onAnswer, wrongAnswers, isFinis
 							onClick={() => onAnswer(option)}
 							disabled={isWrong || isFinished}
 							className={`
-                /* Высота на мобилке меньше (h-20), на ПК больше (sm:h-40) */
                 min-h-[80px] sm:h-40 rounded-[20px] sm:rounded-[32px] 
                 text-xl sm:text-3xl font-bold transition-all duration-300
                 flex items-center justify-center p-4 text-center border-b-4 sm:border-b-8
