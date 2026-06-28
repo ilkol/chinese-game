@@ -18,7 +18,7 @@ interface PlanetMatchingQuizProps {
 }
 
 const PLANET_COUNT = 14;
-const CORRECT_PHRASES = ['正确！Идеально! ✨', '棒！Супер! 🚀', '太好了！Отлично! 🌟', '对了！Так держать! 💪'];
+const CORRECT_PHRASES = ['Идеально! ✨', 'Супер! 🚀', 'Отлично! 🌟', 'Так держать! 💪'];
 const WRONG_PHRASES = ['Не та буква! 🛸', 'Слушай внимательнее 🌙', 'Попробуй ещё раз ✨', 'Почти! 🚀'];
 
 const random = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
