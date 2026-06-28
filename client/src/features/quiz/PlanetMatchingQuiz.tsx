@@ -148,11 +148,12 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 	backgroundSrc,
 	onComplete,
 }) => {
-	// Разбиваем пары на раунды
+
 	const rounds = Array.from(
 		{ length: Math.ceil(pairs.length / pairsPerRound) },
 		(_, i) => pairs.slice(i * pairsPerRound, i * pairsPerRound + pairsPerRound)
 	);
+	console.log('Rounds:', rounds);
 
 	const [roundIndex, setRoundIndex] = useState(0);
 	const [finished, setFinished] = useState(false);
@@ -168,7 +169,7 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 	const [wrongIds, setWrongIds] = useState<string[]>([]);
 
 	// Перемешанные порядки для текущего раунда
-	const [topOrder] = useState(() => [...currentRound].sort(() => Math.random() - 0.5));
+	const [topOrder, setTopOrder] = useState(() => [...currentRound].sort(() => Math.random() - 0.5));
 	const [bottomOrder, setBottomOrder] = useState(() => [...currentRound].sort(() => Math.random() - 0.5));
 
 	// Картинки и позиции — генерируем один раз для раунда
@@ -207,6 +208,7 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 			setSelectedTop(null);
 			setSelectedBottom(null);
 			setWrongIds([]);
+			setTopOrder([...rounds[next]].sort(() => Math.random() - 0.5));
 			setBottomOrder([...rounds[next]].sort(() => Math.random() - 0.5));
 		}
 	}, [roundIndex, rounds, onComplete]);
