@@ -12,6 +12,7 @@ export default {
 		'from-purple-400', 'to-purple-400',
 		'bg-green-600',
 		"text-green-300",
+		"bg-red-400"
 		// Добавь сюда все остальные цвета, которые используешь в данных
 	],
 	theme: {
