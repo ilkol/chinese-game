@@ -20,16 +20,12 @@ export const useGameSession = (user, setUser) => {
 			updateLocalProgress(selectedLevel?.id, activeStepId);
 
 			if (selectedLevelStep?.type === 'final') {
-				setView('topic_menu');
 				setTimeout(() => setShowVictory(true), 500);
-			} else {
-				setView('topic_menu');
 			}
+			window.history.back();
 		} catch (e) {
 			console.error('Ошибка сохранения прогресса:', e);
-			setView('topic_menu');
-		} finally {
-			setSelectedLevelStep(null);
+			window.history.back();
 		}
 	}, [activeStepId, selectedLevel, selectedLevelStep]);
 
