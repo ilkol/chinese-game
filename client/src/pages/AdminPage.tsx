@@ -171,7 +171,7 @@ const DialogEditor = ({ stepId, initialSteps }: { stepId: number; initialSteps: 
 
 					{/* Превью текста */}
 					{step.text && (
-						<div className="bg-white border border-slate-100 rounded-xl p-3 text-sm text-slate-600 leading-relaxed">
+						<div className="bg-white border border-slate-100 rounded-xl p-3 text-sm text-slate-600 leading-relaxed whitespace-pre-line">
 							{step.text.split(/(\*[^*]+\*)/g).map((part, j) =>
 								part.startsWith('*') && part.endsWith('*')
 									? <strong key={j} className={`text-${step.bg}-600`}>{part.slice(1, -1)}</strong>

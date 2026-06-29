@@ -68,7 +68,7 @@ const IntroDialog: React.FC<IntroDialogProps> = ({ steps, onFinish }) => {
 						className="bg-black/60 backdrop-blur-xl border-2 border-white/20 rounded-[32px] p-8 pt-10 min-h-[160px] cursor-pointer hover:border-white/40 transition-all shadow-2xl"
 					>
 						{step.text && (
-							<p className="text-white text-lg md:text-xl font-medium leading-relaxed">
+							<p className="text-white text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line">
 								{step.text.split(/(\*[^*]+\*)/g).map((part, i) =>
 									part.startsWith('*') && part.endsWith('*') ? (
 										<span key={i} className={`font-black text-${bg}-300`}>
