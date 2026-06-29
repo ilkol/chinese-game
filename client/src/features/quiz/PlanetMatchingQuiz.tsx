@@ -53,12 +53,12 @@ const assignImages = (count: number): number[] => {
 };
 
 // Позиции для планет в ряду — с джиттером
-const generateRowPositions = (count: number, containerWidth = 320) => {
+const generateRowPositions = (count: number, containerWidth = 500) => {
 	const slotWidth = containerWidth / count;
-	const yAnchors = [10, 90, 0, 100, 20, 80]; // px — чередование вверх/вниз
+	const yAnchors = [10, 110, 0, 120, 20, 100]; // px — чередование вверх/вниз
 	
 	return Array.from({ length: count }).map((_, i) => ({
-		x: slotWidth * i + slotWidth / 2 - 40 + jitter(10),
+		x: slotWidth * i + slotWidth / 2 - 40 + jitter(10) - 100,
 		y: yAnchors[i % yAnchors.length] + jitter(10), // якорь + небольшой джиттер
 		size: 125 + Math.floor(Math.random() * 25),
 	}));
@@ -122,7 +122,7 @@ const Planet: React.FC<PlanetProps> = ({ label, imageIndex, position, state, isS
 						<img
 							src={imageSrc}
 							alt={label}
-							className="w-3/5 h-3/5 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+							className="w-5/5 h-5/5 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
 						/>
 					) : isSound ? (
 						<Volume2
