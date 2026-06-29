@@ -55,12 +55,12 @@ const assignImages = (count: number): number[] => {
 // Позиции для планет в ряду — с джиттером
 const generateRowPositions = (count: number, containerWidth = 320) => {
 	const slotWidth = containerWidth / count;
-	const yAnchors = [20, 70, 10, 80, 40, 60]; // px — чередование вверх/вниз
+	const yAnchors = [10, 90, 0, 100, 20, 80]; // px — чередование вверх/вниз
 	
 	return Array.from({ length: count }).map((_, i) => ({
 		x: slotWidth * i + slotWidth / 2 - 40 + jitter(10),
 		y: yAnchors[i % yAnchors.length] + jitter(10), // якорь + небольшой джиттер
-		size: 75 + Math.floor(Math.random() * 25),
+		size: 125 + Math.floor(Math.random() * 25),
 	}));
 };
 
