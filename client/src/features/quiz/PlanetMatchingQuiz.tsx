@@ -7,6 +7,7 @@ export interface MatchingPlanetPair {
 	label: string;
 	audioSrc?: string;
 	imageSrc?: string;
+	question_label?: string
 }
 
 interface PlanetMatchingQuizProps {
@@ -341,7 +342,7 @@ const PlanetMatchingQuiz: React.FC<PlanetMatchingQuizProps> = ({
 									imageIndex={images[i]}
 									position={topPositions[i]}
 									state={getTopState(pair.id)}
-									label={pair.label}        // ← добавить
+									label={pair.question_label ?? pair.label}        // ← добавить
 									imageSrc={pair.imageSrc}        // ← добавить
 									isSound={!pair.imageSrc}        // ← звук только если нет картинки
 									isPlaying={playingId === pair.id}
