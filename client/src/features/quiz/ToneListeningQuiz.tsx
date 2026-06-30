@@ -4,7 +4,7 @@ import { ChevronRight, RotateCcw, Volume2 } from 'lucide-react';
 
 export interface ToneQuestion {
 	correct: string;
-	wrong: string;
+	wrong: string[];
 	audioSrc?: string;
 	audioStart?: number;
 	audioDuration?: number;
@@ -30,7 +30,17 @@ const WRONG_PHRASES = [
 ];
 
 const random = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const shuffle = <T,>(a: T, b: T): [T, T] => (Math.random() < 0.5 ? [a, b] : [b, a]);
+
+const shuffleArray = <T,>(arr: T[]): T[] => {
+	const result = [...arr];
+	for (let i = result.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[result[i], result[j]] = [result[j], result[i]];
+	}
+	return result;
+};
+
+const buildChoices = (q: ToneQuestion): string[] => shuffleArray([q.correct, ...q.wrong]);
 
 const STARS = Array.from({ length: 60 }).map((_, i) => {
 	const size = Math.random() * 2.5 + 0.5;
@@ -104,12 +114,18 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 	const [finished, setFinished] = useState(false);
 	const [charMsg, setCharMsg] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
-	const [choices, setChoices] = useState<[string, string]>(() => shuffle(questions[0].correct, questions[0].wrong));
+	const [choices, setChoices] = useState<string[]>(() => buildChoices(questions[0]));
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const charTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const q = questions[current];
+
+	// Адаптивная сетка — 2 колонки если вариантов мало, иначе 2-3 в зависимости от количества
+	const gridCols = choices.length <= 2 ? 'grid-cols-2' : choices.length <= 4 ? 'grid-cols-2' : 'grid-cols-3';
+	// Шрифт уменьшается когда вариантов больше
+	const choiceTextSize = choices.length <= 2 ? 'text-5xl' : choices.length <= 4 ? 'text-4xl' : 'text-3xl';
+	const choicePadding = choices.length <= 4 ? 'py-8' : 'py-6';
 
 	const showBubble = useCallback((msg: string) => {
 		if (charTimerRef.current) clearTimeout(charTimerRef.current);
@@ -124,7 +140,6 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 
 		const audio = new Audio(src);
 		const start = q.audioStart ?? current * segmentDuration;
-		
 		const duration = q.audioDuration ?? segmentDuration;
 
 		audio.currentTime = start;
@@ -161,7 +176,7 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 		}
 		const next = current + 1;
 		setCurrent(next);
-		setChoices(shuffle(questions[next].correct, questions[next].wrong));
+		setChoices(buildChoices(questions[next]));
 		setAnswered(false);
 		setChosen(null);
 	};
@@ -169,7 +184,7 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 	const handleRestart = () => {
 		setCurrent(0); setScore(0); setAnswered(false);
 		setChosen(null); setFinished(false); setCharMsg(null);
-		setChoices(shuffle(questions[0].correct, questions[0].wrong));
+		setChoices(buildChoices(questions[0]));
 	};
 
 	return (
@@ -214,7 +229,7 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 						</motion.button>
 						<p className="text-white/30 text-xs -mt-4">Нажми ещё раз, чтобы повторить</p>
 
-						<div className="grid grid-cols-2 gap-4 w-full mt-2">
+						<div className={`grid ${gridCols} gap-4 w-full mt-2`}>
 							{choices.map(ch => {
 								const isCorrect = ch === q.correct;
 								const isPicked = ch === chosen;
@@ -232,7 +247,7 @@ const ToneListeningQuiz: React.FC<ToneListeningQuizProps> = ({
 										transition={{ duration: 0.35 }}
 										disabled={answered}
 										onClick={() => handleChoice(ch)}
-										className={`rounded-2xl border-2 py-8 text-5xl font-bold transition-all ${style}`}
+										className={`rounded-2xl border-2 ${choicePadding} ${choiceTextSize} font-bold transition-all ${style}`}
 										style={{ fontFamily: "'Noto Sans SC', serif" }}
 									>
 										{ch}
